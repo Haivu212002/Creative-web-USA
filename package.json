@@ -1,0 +1,14 @@
+{
+  "name": "fashion-nails-spa",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fashion Nails & Spa website and local content studio. No build or runtime dependencies.",
+  "scripts": {
+    "start": "python3 -m http.server 4173 --bind 0.0.0.0",
+    "check": "node --check assets/js/core.js && node --check assets/js/site.js && node --check assets/js/admin.js",
+    "test": "node tests/core.test.js",
+    "test:browser": "python3 tests/browser_smoke.py"
+  },
+  "engines": { "node": ">=20" }
+}
