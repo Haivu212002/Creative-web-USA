@@ -27,11 +27,13 @@ Kiểm tra logic dùng Node.js >=20. Kiểm tra trình duyệt dùng Python, th�
 - `index.html`: website 7 mục menu.
 - `assets/css/site.css`: giao diện desktop/mobile, các thành phần dùng chung.
 - `assets/js/site.js`: lọc dịch vụ, gallery/lightbox, planner gọi xác nhận lịch.
+- `service.html?service=<id>`, `assets/js/service.js`, `assets/css/service.css`: trang thông tin riêng của từng dịch vụ; ảnh, tiêu đề và liên kết trong card đều mở đúng dịch vụ.
 - `content.json`: nội dung công khai có phiên bản schema, các giá trị chưa biết là `null`.
 - `assets/js/core.js`: kiểm tra dữ liệu, bản nháp, lịch theo `America/New_York`.
 - `admin/index.html`, `assets/js/admin.js`, `assets/css/admin.css`: trình sửa bản nháp.
-- `assets/images/`: ảnh từ `Archive.zip` người dùng cung cấp, sao chép không sửa ảnh.
+- `assets/images/`: JPEG gốc từ ZIP người dùng cung cấp, cùng các bản WebP đã chỉnh để hiển thị trên website. Ảnh JPEG gốc giữ nguyên.
 - `docs/media-sources.json`: tên và SHA-256 đối chiếu với ảnh gốc trong ZIP.
+- `docs/media-edits.json`: ánh xạ, kích thước và SHA-256 của 14 ảnh đã chỉnh với ảnh gốc. Các bản `*-enhanced.webp` dùng trên website; JPEG gốc vẫn giữ nguyên.
 
 ## Thông tin và nguồn
 
@@ -42,7 +44,7 @@ Kiểm tra logic dùng Node.js >=20. Kiểm tra trình duyệt dùng Python, th�
 - Giờ mở cửa đọc từ ảnh `1793603130222_5040336832554875085_g6322614212090226305_15eaecc37ee0ce3c74a2635c01f7137c.jpg`: Chủ nhật/thứ hai đóng cửa; thứ ba/thứ tư 12:00–18:00; thứ năm/thứ sáu 10:30–19:00; thứ bảy 09:00–17:00. Website ghi rõ giờ có thể thay đổi, cần gọi xác nhận.
 - “Nails & Go $25” lấy từ ảnh yêu cầu 7 menu. Chưa có mô tả gói, thời hạn hay điều kiện cụ thể nên website mời khách gọi hỏi chi tiết, không tự thêm quyền lợi.
 - Chưa có bảng giá đầy đủ hoặc thời lượng dịch vụ: hiển thị “Call for pricing”, không tự đặt giá/thời lượng.
-- Ảnh khách, nail và nội thất là ảnh do người dùng gửi. Không đưa ảnh tham khảo người mẫu hoặc ảnh chụp yêu cầu lên gallery. Một số ảnh gốc có business card/tên miền cũ; không sửa hoặc tẩy nội dung ảnh gốc.
+- Ảnh khách, nail và nội thất là ảnh do người dùng gửi. Theo yêu cầu tiếp theo, 14 ảnh thực tế đang hiển thị đã được xử lý bằng image_gen để tăng độ rõ, giảm nhiễu, cân bằng trắng và chỉnh màu tự nhiên. Đã kiểm tra trực quan các bản chỉnh; không yêu cầu thiết kế mẫu nail mới hoặc thay khuôn mặt. Kết quả được mã hóa WebP chất lượng 90 bằng ImageMagick để phục vụ web; ImageMagick không dùng để thực hiện chỉnh màu/độ nét. Các ảnh JPEG gốc và ZIP vẫn giữ nguyên, có kiểm tra SHA-256. Ảnh tham khảo người mẫu và ảnh chụp yêu cầu không đưa lên gallery. Một số ảnh có business card/tên miền cũ; thông tin liên hệ dạng chữ trên website dùng thông tin người dùng xác nhận.
 - Chưa có liên kết YouTube/TikTok, cặp ảnh trước/sau, testimonial có nội dung xác thực, thể lệ giveaway hay tên người thắng: không bịa nội dung hoặc tạo chương trình giả. Specials & Rewards dẫn khách đến Facebook để xem thông báo.
 
 ## Dùng Content Studio
@@ -56,6 +58,12 @@ Studio là công cụ chỉnh **bản nháp cục bộ**, không phải backend 
 5. Để đưa nội dung lên website, sao lưu file cũ, kiểm tra diff, thay `content.json` bằng file đã xuất rồi triển khai repository. Studio không có token GitHub và không tự push.
 
 Ảnh mới có thể dùng đường dẫn `assets/images/ten-anh.jpg`, URL HTTPS, hoặc tải ảnh raster tối đa 700 KB/ảnh để nhúng trong bản nháp/JSON. Không chấp nhận SVG/script URL. Dung lượng `localStorage` bị giới hạn: ưu tiên đưa ảnh vào `assets/images/` và dùng đường dẫn nếu gallery lớn. Ảnh được nhúng chỉ có trong file JSON sau khi xuất; không được upload lên cloud.
+
+## Thông tin từng dịch vụ
+
+Ảnh và tiêu đề tại “Find your next favorite” mở `service.html?service=<id>`. Mỗi dịch vụ có mô tả, các nội dung nên trao đổi, chuẩn bị trước khi đến, thông tin cần biết, ảnh liên quan, giá và thời lượng (nếu đã có), cùng nút lên kế hoạch ghé tiệm. Các trường `details`, `highlights`, `preparation`, `goodToKnow` có thể sửa trong Studio; hai trường danh sách dùng mỗi dòng làm một ý. Schema vẫn chấp nhận bản nháp cũ chưa có các trường này. Không tự thêm giá, quy trình điều trị hoặc gói dịch vụ chưa được xác nhận.
+
+Liên kết trang chi tiết giữ `preview=draft` khi đang xem bản nháp và giữ dịch vụ đã chọn khi quay về planner. ID không tồn tại hiển thị trang không tìm thấy, không tự chọn một dịch vụ khác. Giá/điện thoại trên trang chi tiết lấy từ cùng `content.json` hoặc bản nháp đã chọn.
 
 ## Booking, gift certificates và khuyến mãi
 

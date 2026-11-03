@@ -64,10 +64,17 @@ function renderServices() {
   if (!services.length) { grid.append(el('p', 'empty-state', 'Please call us to ask about services in this category.')); return; }
   for (const service of services) {
     const card = el('article', 'service-card');
-    const photo = el('div', 'service-photo');
+    const detailsUrl = new URL('service.html', location.href);
+    detailsUrl.hash = '';
+    detailsUrl.search = '';
+    detailsUrl.searchParams.set('service', service.id);
+    if (new URLSearchParams(location.search).get('preview') === 'draft') detailsUrl.searchParams.set('preview', 'draft');
+    const photo = el('a', 'service-photo');
+    photo.href = detailsUrl.href;
+    photo.setAttribute('aria-label', `View details for ${service.name}`);
     const image = el('img');
     image.src = service.image;
-    image.alt = `${service.name} inspiration from Fashion Nails & Spa`;
+    image.alt = service.category === 'spa' ? 'A look inside Fashion Nails & Spa' : `${service.name} inspiration from Fashion Nails & Spa`;
     image.loading = 'lazy';
     image.width = 600;
     image.height = 450;
@@ -87,7 +94,15 @@ function renderServices() {
       $('#visit-date').focus({ preventScroll: true });
     });
     footer.append(price, select);
-    body.append(el('h3', '', service.name), el('p', '', service.description), footer);
+    const heading = el('h3');
+    const headingLink = el('a', '', service.name);
+    headingLink.href = detailsUrl.href;
+    heading.append(headingLink);
+    const readMore = el('a', 'service-read-more', 'Explore this service');
+    readMore.href = detailsUrl.href;
+    readMore.setAttribute('aria-label', `Read about ${service.name}`);
+    readMore.append(arrow());
+    body.append(heading, el('p', '', service.description), readMore, footer);
     card.append(photo, body);
     grid.append(card);
   }

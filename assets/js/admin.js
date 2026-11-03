@@ -16,6 +16,10 @@ const entitySpecs = {
     { key: 'name', label: 'Tên dịch vụ', required: true, max: 150 },
     { key: 'category', label: 'Nhóm dịch vụ', options: CATEGORIES },
     { key: 'description', label: 'Mô tả', type: 'textarea', full: true },
+    { key: 'details', label: 'Thông tin chi tiết trên trang dịch vụ', type: 'textarea', full: true, max: 6000 },
+    { key: 'highlights', label: 'Các nội dung nên trao đổi với salon', type: 'textarea', full: true, max: 6000, hint: 'Mỗi dòng là một ý trong danh sách.' },
+    { key: 'preparation', label: 'Chuẩn bị trước khi đến', type: 'textarea', full: true, max: 6000, hint: 'Mỗi dòng là một ý trong danh sách.' },
+    { key: 'goodToKnow', label: 'Thông tin cần biết', type: 'textarea', full: true, max: 6000 },
     { key: 'price', label: 'Giá (USD)', type: 'number', min: 0, max: 10000, step: '0.01', hint: 'Để trống để hiển thị “Call for pricing”.' },
     { key: 'duration', label: 'Thời lượng (phút)', type: 'number', min: 1, max: 480, step: '1', hint: 'Để trống nếu chưa xác định.' },
     { key: 'image', label: 'Ảnh dịch vụ', required: true, full: true, image: true },
@@ -293,7 +297,7 @@ function openEditor(type, item = null) {
   $('#editor-error').hidden = true;
   const fields = $('#editor-fields');
   fields.replaceChildren();
-  const defaults = type === 'services' ? { category: 'nails', image: 'assets/images/nail-art-jewels.jpg' } : type === 'gallery' ? { category: 'nails', src: '' } : { enabled: true };
+  const defaults = type === 'services' ? { category: 'nails', image: 'assets/images/nail-art-jewels-enhanced.webp' } : type === 'gallery' ? { category: 'nails', src: '' } : { enabled: true };
   const values = item || defaults;
   for (const field of spec.fields) fields.append(...makeField(field, values[field.key], 'edit'));
   editorDirty = false;

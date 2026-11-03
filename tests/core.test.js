@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { activePromotions, appointmentSlots, DRAFT_KEY, formatPrice, formatTime, isDate, loadDraft, safeFacebook, safeImage, salonDate, saveDraft, validateContent } from '../assets/js/core.js';
 
 const published = JSON.parse(readFileSync(new URL('../content.json', import.meta.url), 'utf8'));
@@ -91,4 +92,31 @@ test('price and time presentation preserve unknown prices and zero dollar servic
   assert.equal(formatPrice(25.5), '$25.50');
   assert.equal(formatTime('12:00'), '12:00 PM');
   assert.equal(formatTime('09:30'), '9:30 AM');
+});
+
+test('service detail fields are validated without invalidating older drafts', () => {
+  const older = clone();
+  for (const service of older.services) for (const key of ['details', 'highlights', 'preparation', 'goodToKnow']) delete service[key];
+  assert.deepEqual(validateContent(older), []);
+  const invalid = clone();
+  invalid.services[0].details = { unsafe: 'HTML' };
+  invalid.services[1].preparation = 'a'.repeat(6001);
+  assert.equal(validateContent(invalid).filter(error => error.includes('thông tin dịch vụ')).length, 2);
+  assert.ok(published.services.every(service => service.details && service.highlights && service.preparation && service.goodToKnow));
+});
+
+test('displayed salon photos use verified enhanced files and original photographs remain unchanged', () => {
+  const sources = JSON.parse(readFileSync(new URL('../docs/media-sources.json', import.meta.url), 'utf8'));
+  const edits = JSON.parse(readFileSync(new URL('../docs/media-edits.json', import.meta.url), 'utf8'));
+  const digest = file => createHash('sha256').update(readFileSync(new URL(`../${file}`, import.meta.url))).digest('hex');
+  assert.equal(edits.images.length, 14);
+  for (const source of sources.images) assert.equal(digest(source.asset), source.sha256);
+  for (const edit of edits.images) {
+    assert.equal(digest(edit.original), edit.originalSha256);
+    assert.equal(digest(edit.enhanced), edit.enhancedSha256);
+    assert.ok(safeImage(edit.enhanced));
+  }
+  const enhanced = new Set(edits.images.map(image => image.enhanced));
+  const displayed = [...published.services.map(service => service.image), ...published.gallery.map(image => image.src)];
+  assert.ok(displayed.every(image => enhanced.has(image)));
 });

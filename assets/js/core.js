@@ -64,6 +64,9 @@ export function validateContent(data) {
     check(isText(item.name, 150) && item.name.trim().length > 0, `${path}: thiếu tên dịch vụ.`);
     check(Object.hasOwn(CATEGORIES, item.category), `${path}: nhóm dịch vụ không hợp lệ.`);
     check(isText(item.description), `${path}: mô tả không hợp lệ.`);
+    for (const key of ['details', 'highlights', 'preparation', 'goodToKnow']) {
+      check(item[key] === undefined || isText(item[key], 6000), `${path}.${key}: thông tin dịch vụ không hợp lệ.`);
+    }
     check(item.price === null || (typeof item.price === 'number' && Number.isFinite(item.price) && item.price >= 0 && item.price <= 10000), `${path}: giá không hợp lệ.`);
     check(item.duration === null || (Number.isInteger(item.duration) && item.duration > 0 && item.duration <= 480), `${path}: thời gian không hợp lệ.`);
     check(safeImage(item.image), `${path}: đường dẫn ảnh không hợp lệ.`);

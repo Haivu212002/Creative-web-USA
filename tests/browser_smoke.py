@@ -125,6 +125,70 @@ class WebsiteTests(unittest.TestCase):
         expect(page.locator('.admin-service-row')).to_have_count(len(DATA['services']))
         expect(page.locator('#studio-status')).not_to_have_class('studio-status is-error')
 
+    def test_service_photo_opens_the_correct_detail_and_planner(self):
+        page = self.page
+        for service in DATA['services']:
+            page.goto(f'{self.url}/Creative-web-USA/')
+            page.get_by_role('link', name=f"View details for {service['name']}", exact=True).click()
+            expect(page).to_have_url(f"{self.url}/Creative-web-USA/service.html?service={service['id']}")
+            expect(page.locator('#service-name')).to_have_text(service['name'])
+            expect(page.locator('#service-description')).to_have_text(service['details'])
+            expect(page.locator('#service-highlights li')).to_have_count(len(service['highlights'].splitlines()))
+            expect(page.locator('#service-price')).to_have_text('Call for pricing')
+            page.wait_for_function("document.querySelector('#service-image').complete && document.querySelector('#service-image').naturalWidth > 0")
+            expect(page.locator('#service-image')).to_have_attribute('src', service['image'])
+            expect(page.locator('.detail-phone')).to_have_attribute('href', 'tel:+17172484131')
+            page.locator('#service-plan').click()
+            expect(page.locator('#visit-service')).to_have_value(service['id'])
+
+    def test_service_detail_mobile_and_missing_service(self):
+        page = self.page
+        page.goto(f'{self.url}/Creative-web-USA/service.html?service=nail-art')
+        expect(page.locator('#service-name')).to_have_text('Nail Art & Designs')
+        for width in [1440, 768, 390, 320]:
+            page.set_viewport_size({'width': width, 'height': 844})
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+        page.set_viewport_size({'width': 390, 'height': 844})
+        page.evaluate("document.querySelectorAll('img').forEach(image => image.loading = 'eager')")
+        page.wait_for_function("Array.from(document.images).every(image => image.complete && image.naturalWidth > 0)")
+        page.screenshot(path=str(RESULTS / 'service-mobile.png'), full_page=True)
+        page.locator('.menu-toggle').click()
+        page.locator('#main-navigation a[href$="#services"]').click()
+        expect(page.locator('#service-grid')).to_be_visible()
+        page.goto(f'{self.url}/service.html?service=missing-service')
+        expect(page.locator('#service-not-found')).to_be_visible()
+        expect(page.locator('#service-content')).not_to_be_visible()
+
+    def test_service_details_survive_admin_edit_export_and_preview(self):
+        self.open_admin('#services')
+        page = self.page
+        page.get_by_role('button', name='Sửa Manicure', exact=True).click()
+        expect(page.locator('#edit-details')).to_have_value(DATA['services'][0]['details'])
+        literal = 'Personal manicure details <img src=x onerror="window.hacked=true">'
+        page.locator('#edit-details').fill(literal)
+        page.locator('#edit-highlights').fill('First detail\nSecond detail')
+        page.get_by_role('button', name='Lưu bản nháp', exact=True).click()
+        expect(page.locator('#editor-dialog')).not_to_be_visible()
+        with page.expect_download() as download_info:
+            page.locator('#export-button').click()
+        exported = json.loads(Path(download_info.value.path()).read_text())
+        self.assertEqual(exported['services'][0]['details'], literal)
+        preview = self.context.new_page()
+        preview.goto(f'{self.url}/?preview=draft')
+        preview.get_by_role('link', name='View details for Manicure', exact=True).click()
+        expect(preview).to_have_url(f'{self.url}/service.html?service=manicure&preview=draft')
+        expect(preview.locator('#preview-banner')).to_be_visible()
+        expect(preview.locator('#service-description')).to_have_text(literal)
+        expect(preview.locator('#service-highlights li')).to_have_count(2)
+        expect(preview.locator('#service-description img')).to_have_count(0)
+        self.assertIsNone(preview.evaluate('window.hacked'))
+        preview.locator('#service-plan').click()
+        expect(preview.locator('#preview-banner')).to_be_visible()
+        expect(preview.locator('#visit-service')).to_have_value('manicure')
+        published = self.context.new_page()
+        published.goto(f'{self.url}/service.html?service=manicure')
+        expect(published.locator('#service-description')).to_have_text(DATA['services'][0]['details'])
+
     def test_legacy_urls_redirect_to_current_sections(self):
         routes = json.loads((ROOT / 'docs/legacy-routes.json').read_text())
         for name, section in routes.items():

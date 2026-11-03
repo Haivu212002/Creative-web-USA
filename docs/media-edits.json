@@ -1,0 +1,131 @@
+{
+  "method": "image_gen: conservative clarity, noise reduction, white balance, exposure and natural color correction; WebP encoding with ImageMagick, quality 90. Original JPEGs retained unchanged.",
+  "images": [
+    {
+      "original": "assets/images/nail-art-jewels.jpg",
+      "originalSha256": "8810bb07a942e5edc78d658255a5aabfa72c66212767ae4a95833680d487808a",
+      "enhanced": "assets/images/nail-art-jewels-enhanced.webp",
+      "enhancedSha256": "0ec9f3642197a2d55d82344b59a308a11397ffa8c3d6cd7b805d9dd6bef9a88d",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 182474
+    },
+    {
+      "original": "assets/images/nail-art-polka.jpg",
+      "originalSha256": "d694e05993e7e256dcb6074109e81f9199a57590efa8d4cc3801dcd28bd06418",
+      "enhanced": "assets/images/nail-art-polka-enhanced.webp",
+      "enhancedSha256": "28ff596bed1918a572d870ce5a0feb182bc3f321fb6c37b5784abf2a5a530310",
+      "width": 854,
+      "height": 1842,
+      "bytes": 186138
+    },
+    {
+      "original": "assets/images/nail-art-french.jpg",
+      "originalSha256": "b8cbfc214fd5debca83cda85a6ce58db3668056287b015a764a4236f1ea3e617",
+      "enhanced": "assets/images/nail-art-french-enhanced.webp",
+      "enhancedSha256": "61e1983a5223deb6a908f1602c562ac39637c9c9e8825e185a1760c73b0c1546",
+      "width": 1086,
+      "height": 1448,
+      "bytes": 253974
+    },
+    {
+      "original": "assets/images/nail-art-purple.jpg",
+      "originalSha256": "8a4fa88937b5a22f6ab80793a67dbe75bcf94d6dfb6dcc4cbc056f9a765bfa43",
+      "enhanced": "assets/images/nail-art-purple-enhanced.webp",
+      "enhancedSha256": "d53edfccd1f99fe852c5d4aa1439d43edb2f91ff622a537b0dfd66cd95fd77eb",
+      "width": 1451,
+      "height": 1084,
+      "bytes": 309392
+    },
+    {
+      "original": "assets/images/pedicure-neutral.jpg",
+      "originalSha256": "6dabafbeb76adda729fe99b92c13286a761ee92ee1a724a1c8a4638b79ac7ea3",
+      "enhanced": "assets/images/pedicure-neutral-enhanced.webp",
+      "enhancedSha256": "4553c87cbd65c4001a79b902fbe609857a12b70a440948eb3b7504d348df6604",
+      "width": 1672,
+      "height": 941,
+      "bytes": 204090
+    },
+    {
+      "original": "assets/images/nail-art-colorful.jpg",
+      "originalSha256": "6942eefa37d35a3a354d0abbccbce7f2db3f8ed3e89f75c1bcebfc91b1ef46bf",
+      "enhanced": "assets/images/nail-art-colorful-enhanced.webp",
+      "enhancedSha256": "f5570cdeac0d9faea39d49c44015e98924927617e9218e413d023a7ef1c8a6f4",
+      "width": 941,
+      "height": 1672,
+      "bytes": 176570
+    },
+    {
+      "original": "assets/images/pedicure-friends.jpg",
+      "originalSha256": "37e7d4b13db74a6adbf60e40af3f0edcd4d1f2dbdef1464aa6a9aef546788491",
+      "enhanced": "assets/images/pedicure-friends-enhanced.webp",
+      "enhancedSha256": "435f8c1570a4f084c0e93d73b92c67f3b907bed9cc521c1709edb44a7a0fc949",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 467068
+    },
+    {
+      "original": "assets/images/nail-art-coral.jpg",
+      "originalSha256": "965a6778ca68e7d7164cdd85c57e7aaff29f93a6a60707c0f2cef9180753a6ce",
+      "enhanced": "assets/images/nail-art-coral-enhanced.webp",
+      "enhancedSha256": "28b5732eef69c165dff727cc28acc4caa68a00b6e455e8b0d1133eec342823d5",
+      "width": 874,
+      "height": 1799,
+      "bytes": 223518
+    },
+    {
+      "original": "assets/images/nail-art-floral.jpg",
+      "originalSha256": "26fbeea3a6b0577daa31dc4ba3382f73c4b127e3095b99523870a66b5e325571",
+      "enhanced": "assets/images/nail-art-floral-enhanced.webp",
+      "enhancedSha256": "07f144c0efd2a78748af9316c156433d161927ed7e57d2c53cd011a427fb6282",
+      "width": 874,
+      "height": 1799,
+      "bytes": 290328
+    },
+    {
+      "original": "assets/images/pedicure-red.jpg",
+      "originalSha256": "ed413ab69b4b8a185fea45090af6cacc1ee88ee4737d6c817bbd7e3d7586875d",
+      "enhanced": "assets/images/pedicure-red-enhanced.webp",
+      "enhancedSha256": "1f8aa78a3a295f4240751ea1673d7615b8b01b6f643775b860359b4f247f86bc",
+      "width": 874,
+      "height": 1799,
+      "bytes": 395532
+    },
+    {
+      "original": "assets/images/salon-interior.jpg",
+      "originalSha256": "10c87a086b0917c52044b2b27e88e11b8cafa76531378b96644507a65a8d1949",
+      "enhanced": "assets/images/salon-interior-enhanced.webp",
+      "enhancedSha256": "5c857e9600e26bb84afb1d92b49aa1f6c5b6b5f8d2fcf3308a184c0a8e57ccbe",
+      "width": 1836,
+      "height": 856,
+      "bytes": 366410
+    },
+    {
+      "original": "assets/images/salon-pedicure.jpg",
+      "originalSha256": "b5f3bfdfba603c4a0d6f082434de03754fef3314ac46eb66f37bfe21bf668584",
+      "enhanced": "assets/images/salon-pedicure-enhanced.webp",
+      "enhancedSha256": "a41f8563df5741d0498d31977312aa778ff60b9e08de15e4cf38ab2c0c0491ae",
+      "width": 1836,
+      "height": 856,
+      "bytes": 367464
+    },
+    {
+      "original": "assets/images/salon-community.jpg",
+      "originalSha256": "b5b038b696212792b50d1a24433de4da00beedce43938ccd70a7cd898eb4f0b9",
+      "enhanced": "assets/images/salon-community-enhanced.webp",
+      "enhancedSha256": "3e332817fe98a75f23c3338d90b687ba5d0fe9319e671b3bdcff8deea18264e2",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 212918
+    },
+    {
+      "original": "assets/images/salon-celebration.jpg",
+      "originalSha256": "9c9315ee8f13b2a82f96f8a16ebf0e3b91a2825b0d018101b089d2bcf76e86f2",
+      "enhanced": "assets/images/salon-celebration-enhanced.webp",
+      "enhancedSha256": "e15fc4ba7981b02a9da46a9bd001cf0ac7f229cb63027d796c81d39149a2c5c4",
+      "width": 1086,
+      "height": 1448,
+      "bytes": 273394
+    }
+  ]
+}
