@@ -51,6 +51,8 @@ function applyContent() {
     return option;
   });
   $('#visit-service').replaceChildren(new Option('Choose a service', ''), ...options);
+  const requestedService = new URLSearchParams(location.search).get('service');
+  if (content.services.some(service => service.id === requestedService)) $('#visit-service').value = requestedService;
   $('#visit-date').min = salonDate();
   addStructuredData();
 }

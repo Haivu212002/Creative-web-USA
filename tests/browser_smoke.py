@@ -120,10 +120,29 @@ class WebsiteTests(unittest.TestCase):
         page = self.page
         page.goto(f'{self.url}/Creative-web-USA/')
         expect(page.locator('.service-card')).to_have_count(len(DATA['services']))
-        page.locator('.footer-bottom a').click()
+        page.locator('.footer-bottom a[href="admin/"]').click()
         expect(page).to_have_url(f'{self.url}/Creative-web-USA/admin/')
         expect(page.locator('.admin-service-row')).to_have_count(len(DATA['services']))
         expect(page.locator('#studio-status')).not_to_have_class('studio-status is-error')
+
+    def test_legacy_urls_redirect_to_current_sections(self):
+        routes = json.loads((ROOT / 'docs/legacy-routes.json').read_text())
+        for name, section in routes.items():
+            self.page.goto(f'{self.url}/Creative-web-USA/{name}')
+            expect(self.page).to_have_url(f'{self.url}/Creative-web-USA/#{section}')
+            expect(self.page.locator('.service-card')).to_have_count(len(DATA['services']))
+        self.page.goto(f'{self.url}/Creative-web-USA/booking.html?service=design')
+        expect(self.page.locator('#visit-service')).to_have_value('nail-art')
+
+    def test_preserved_journal_and_updated_privacy(self):
+        page = self.page
+        for article in ['blog.html', 'journal-nail-care.html', 'journal-choose-your-shape.html', 'journal-first-visit.html']:
+            page.goto(f'{self.url}/Creative-web-USA/{article}')
+            expect(page.locator('h1')).to_be_visible()
+            expect(page.locator('img').first).to_be_visible()
+        page.goto(f'{self.url}/Creative-web-USA/privacy.html')
+        expect(page.locator('h1')).to_contain_text('Your information')
+        expect(page.locator('main')).to_contain_text('does not submit a booking request')
 
     def test_visit_planner_closed_days_and_call_confirmation(self):
         page = self.open_public()
