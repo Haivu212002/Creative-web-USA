@@ -30,39 +30,232 @@
     "description": "For birthdays, holidays, thank-yous, or just because. Ask us about gift certificates and let someone special choose their own moment of self-care."
   },
   "hours": [
-    { "day": 0, "open": null, "close": null },
-    { "day": 1, "open": null, "close": null },
-    { "day": 2, "open": "12:00", "close": "18:00" },
-    { "day": 3, "open": "12:00", "close": "18:00" },
-    { "day": 4, "open": "10:30", "close": "19:00" },
-    { "day": 5, "open": "10:30", "close": "19:00" },
-    { "day": 6, "open": "09:00", "close": "17:00" }
+    {
+      "day": 0,
+      "open": null,
+      "close": null
+    },
+    {
+      "day": 1,
+      "open": null,
+      "close": null
+    },
+    {
+      "day": 2,
+      "open": "12:00",
+      "close": "18:00"
+    },
+    {
+      "day": 3,
+      "open": "12:00",
+      "close": "18:00"
+    },
+    {
+      "day": 4,
+      "open": "10:30",
+      "close": "19:00"
+    },
+    {
+      "day": 5,
+      "open": "10:30",
+      "close": "19:00"
+    },
+    {
+      "day": 6,
+      "open": "09:00",
+      "close": "17:00"
+    }
   ],
   "services": [
-    { "id": "manicure", "name": "Manicure", "category": "nails", "description": "A fresh shape, a favorite shade, and a beautifully polished finish.", "price": null, "duration": null, "image": "assets/images/nail-art-polka.jpg" },
-    { "id": "gel-nails", "name": "Gel Nails", "category": "nails", "description": "Glossy color for your everyday style. Ask us about available finishes.", "price": null, "duration": null, "image": "assets/images/nail-art-purple.jpg" },
-    { "id": "nail-art", "name": "Nail Art & Designs", "category": "nails", "description": "A little personality at your fingertips, from playful details to extra sparkle.", "price": null, "duration": null, "image": "assets/images/nail-art-jewels.jpg" },
-    { "id": "pedicure", "name": "Pedicure", "category": "pedicure", "description": "Take a seat and give your feet a little attention and a fresh pop of color.", "price": null, "duration": null, "image": "assets/images/pedicure-neutral.jpg" },
-    { "id": "waxing", "name": "Waxing", "category": "spa", "description": "A finishing touch to your beauty routine. Call to discuss areas and availability.", "price": null, "duration": null, "image": "assets/images/salon-interior.jpg" },
-    { "id": "facial", "name": "Facial Care", "category": "spa", "description": "Make a little room for self-care. Call us to find out about current facial services.", "price": null, "duration": null, "image": "assets/images/salon-pedicure.jpg" }
+    {
+      "id": "manicure",
+      "name": "Manicure",
+      "category": "nails",
+      "description": "A fresh shape, a favorite shade, and a beautifully polished finish.",
+      "price": null,
+      "duration": null,
+      "image": "assets/images/nail-art-polka-enhanced.webp",
+      "details": "A fresh manicure can be an everyday finishing touch or the start of a special occasion. Tell us whether you prefer a short, practical shape, a soft neutral, or a brighter color. We’ll talk through the service and finish that suit your current nails and the options available at the salon.",
+      "highlights": "Your preferred nail length and shape\nThe color and polish finish you have in mind\nAny existing product that may need removal\nA personal quote before your appointment is confirmed",
+      "preparation": "Bring a photo or save a color reference if you have one.\nLet us know if you already have gel, extensions, or another product on your nails.\nMention any product sensitivities or comfort concerns when you call.",
+      "goodToKnow": "The exact steps, polish options, price, and appointment length are confirmed by the salon. Removal, repairs, or extra design work may need a separate quote. The photos show examples from our collection, rather than a fixed package."
+    },
+    {
+      "id": "gel-nails",
+      "name": "Gel Nails",
+      "category": "nails",
+      "description": "Glossy color for your everyday style. Ask us about available finishes.",
+      "price": null,
+      "duration": null,
+      "image": "assets/images/nail-art-purple-enhanced.webp",
+      "details": "Love a glossy finish? Ask us about our current gel nail options, available colors, and the look you would like to create. A gel appointment should be planned around what is already on your nails, your preferred length and shape, and any design details you want to add.",
+      "highlights": "Available gel colors and finishes\nYour preferred shape and length\nWhether existing gel or another product needs removal\nAny nail art or extra details you want included in the quote",
+      "preparation": "Tell us what product is currently on your nails, if you know.\nAvoid picking or peeling off existing gel before your visit; ask about appropriate removal.\nBring a reference image and let us know if you need a repair.",
+      "goodToKnow": "Products, application options, removal, and appointment lengths vary. Please confirm what is included and how to care for your finish with the salon. No specific wear time or result is guaranteed by the website."
+    },
+    {
+      "id": "nail-art",
+      "name": "Nail Art & Designs",
+      "category": "nails",
+      "description": "A little personality at your fingertips, from playful details to extra sparkle.",
+      "price": null,
+      "duration": null,
+      "image": "assets/images/nail-art-jewels-enhanced.webp",
+      "details": "From a small accent to a look with a little more sparkle, nail art starts with your inspiration. Bring a photo, a color palette, or a simple idea. We’ll discuss which details can work with your nails and the services currently available, then confirm the quote and time needed.",
+      "highlights": "Your color palette and inspiration photos\nSimple accents, pattern details, or sparkle you would like to discuss\nThe shape and length needed for the look\nA quote based on the amount of detail and work involved",
+      "preparation": "Save one or two clear photos of your favorite designs.\nTell us whether the color, shape, or artwork matters most to you.\nMention any existing product, removal, or repair work when arranging your visit.",
+      "goodToKnow": "Designs are quoted individually. Photo inspiration is a starting point, and the final look depends on your nails, the materials available, and the details agreed with your technician. Please confirm added design time before booking."
+    },
+    {
+      "id": "pedicure",
+      "name": "Pedicure",
+      "category": "pedicure",
+      "description": "Take a seat and give your feet a little attention and a fresh pop of color.",
+      "price": null,
+      "duration": null,
+      "image": "assets/images/pedicure-neutral-enhanced.webp",
+      "details": "Take a seat and give your toes a fresh start. Whether you have a favorite everyday shade or want a color for a special occasion, call us to discuss the pedicure options currently available and the finish you have in mind.",
+      "highlights": "Current pedicure services and what each option includes\nYour preferred polish color and finish\nAny existing product that needs removal\nThe service price and time needed before you arrive",
+      "preparation": "Mention existing polish, gel, or other product when you call.\nAsk what footwear is best for your chosen finish after the visit.\nLet the salon know about comfort or product concerns in advance.",
+      "goodToKnow": "The photos are examples from our salon collection. Treatment steps, polish options, add-ons, and appointment lengths are confirmed by phone; the website does not promise a particular package or result."
+    },
+    {
+      "id": "waxing",
+      "name": "Waxing",
+      "category": "spa",
+      "description": "A finishing touch to your beauty routine. Call to discuss areas and availability.",
+      "price": null,
+      "duration": null,
+      "image": "assets/images/salon-interior-enhanced.webp",
+      "details": "For a finishing touch to your beauty routine, speak with the salon about the waxing services and treatment areas currently available. Tell us which area you want to discuss so we can advise on the options, preparation, time, and pricing before you visit.",
+      "highlights": "Which treatment areas are currently available\nYour preparation and aftercare questions\nProduct sensitivities or skin-care concerns to discuss with the team\nThe exact service, price, and appointment length",
+      "preparation": "Call to confirm that your requested treatment area is available.\nAsk the salon for preparation instructions for the specific service.\nMention recent skin treatments, product sensitivities, or other concerns before confirming your visit.",
+      "goodToKnow": "Available treatments, preparation, and pricing depend on the area and service discussed with the salon. Confirm those details and any aftercare guidance before your visit. The photos on this page show the salon interior."
+    },
+    {
+      "id": "facial",
+      "name": "Facial Care",
+      "category": "spa",
+      "description": "Make a little room for self-care. Call us to find out about current facial services.",
+      "price": null,
+      "duration": null,
+      "image": "assets/images/salon-pedicure-enhanced.webp",
+      "details": "Make a little room for self-care. Call to ask about the facial care options currently offered, tell us what you would like from the visit, and discuss products or comfort preferences before choosing a service.",
+      "highlights": "Current facial care services and what is included\nYour goals and preferred level of care\nProducts and sensitivities you would like to discuss\nPreparation, appointment length, and a confirmed quote",
+      "preparation": "Call ahead to discuss the service you have in mind.\nMention product sensitivities and any recent skin treatments.\nAsk for preparation and aftercare guidance for the specific service offered.",
+      "goodToKnow": "Ask which facial services and products are currently available and what each option includes. Your service, preparation, price, and appointment length are confirmed directly with the salon. The photos show the salon interior."
+    }
   ],
   "gallery": [
-    { "id": "jewels", "src": "assets/images/nail-art-jewels.jpg", "alt": "Blush pink nails with colorful jewel accents", "category": "nails", "caption": "A little extra sparkle" },
-    { "id": "polka", "src": "assets/images/nail-art-polka.jpg", "alt": "Cream and blush polka-dot nail art photographed inside the salon", "category": "nails", "caption": "Pretty little details" },
-    { "id": "purple", "src": "assets/images/nail-art-purple.jpg", "alt": "Purple manicure with floral accent nails and a Fashion Nails & Spa business card", "category": "nails", "caption": "Pick your happy color" },
-    { "id": "salon", "src": "assets/images/salon-interior.jpg", "alt": "The manicure stations and pedicure chairs at Fashion Nails & Spa", "category": "salon", "caption": "Your Water Street beauty escape" },
-    { "id": "friends", "src": "assets/images/pedicure-friends.jpg", "alt": "Friends showing their colorful pedicures together", "category": "pedicure", "caption": "Better with friends" },
-    { "id": "coral", "src": "assets/images/nail-art-coral.jpg", "alt": "A salon guest showing her coral and patterned nails", "category": "nails", "caption": "A look that’s all you" },
-    { "id": "community", "src": "assets/images/salon-community.jpg", "alt": "A group of guests enjoying a visit to Fashion Nails & Spa", "category": "community", "caption": "Good company, great memories" },
-    { "id": "neutral", "src": "assets/images/pedicure-neutral.jpg", "alt": "A neutral pink pedicure with gold sandals", "category": "pedicure", "caption": "Ready for your next step" },
-    { "id": "french", "src": "assets/images/nail-art-french.jpg", "alt": "A guest showing a light manicure inside the salon", "category": "nails", "caption": "Fresh, simple, beautiful" },
-    { "id": "chairs", "src": "assets/images/salon-pedicure.jpg", "alt": "A row of burgundy pedicure chairs inside the salon", "category": "salon", "caption": "Take a seat. Make yourself at home." },
-    { "id": "colorful", "src": "assets/images/nail-art-colorful.jpg", "alt": "Colorful nail designs shown together by salon guests", "category": "nails", "caption": "So many ways to be you" },
-    { "id": "celebration", "src": "assets/images/salon-celebration.jpg", "alt": "Friends gathered for a celebration at Fashion Nails & Spa", "category": "community", "caption": "Make it a celebration" },
-    { "id": "red", "src": "assets/images/pedicure-red.jpg", "alt": "A bright red pedicure photographed at the salon", "category": "pedicure", "caption": "A classic pop of color" },
-    { "id": "floral", "src": "assets/images/nail-art-floral.jpg", "alt": "A guest showing delicate nail art at Fashion Nails & Spa", "category": "nails", "caption": "The finishing touch" }
+    {
+      "id": "jewels",
+      "src": "assets/images/nail-art-jewels-enhanced.webp",
+      "alt": "Blush pink nails with colorful jewel accents",
+      "category": "nails",
+      "caption": "A little extra sparkle"
+    },
+    {
+      "id": "polka",
+      "src": "assets/images/nail-art-polka-enhanced.webp",
+      "alt": "Cream and blush polka-dot nail art photographed inside the salon",
+      "category": "nails",
+      "caption": "Pretty little details"
+    },
+    {
+      "id": "purple",
+      "src": "assets/images/nail-art-purple-enhanced.webp",
+      "alt": "Purple manicure with floral accent nails and a Fashion Nails & Spa business card",
+      "category": "nails",
+      "caption": "Pick your happy color"
+    },
+    {
+      "id": "salon",
+      "src": "assets/images/salon-interior-enhanced.webp",
+      "alt": "The manicure stations and pedicure chairs at Fashion Nails & Spa",
+      "category": "salon",
+      "caption": "Your Water Street beauty escape"
+    },
+    {
+      "id": "friends",
+      "src": "assets/images/pedicure-friends-enhanced.webp",
+      "alt": "Friends showing their colorful pedicures together",
+      "category": "pedicure",
+      "caption": "Better with friends"
+    },
+    {
+      "id": "coral",
+      "src": "assets/images/nail-art-coral-enhanced.webp",
+      "alt": "A salon guest showing her coral and patterned nails",
+      "category": "nails",
+      "caption": "A look that’s all you"
+    },
+    {
+      "id": "community",
+      "src": "assets/images/salon-community-enhanced.webp",
+      "alt": "A group of guests enjoying a visit to Fashion Nails & Spa",
+      "category": "community",
+      "caption": "Good company, great memories"
+    },
+    {
+      "id": "neutral",
+      "src": "assets/images/pedicure-neutral-enhanced.webp",
+      "alt": "A neutral pink pedicure with gold sandals",
+      "category": "pedicure",
+      "caption": "Ready for your next step"
+    },
+    {
+      "id": "french",
+      "src": "assets/images/nail-art-french-enhanced.webp",
+      "alt": "A guest showing a light manicure inside the salon",
+      "category": "nails",
+      "caption": "Fresh, simple, beautiful"
+    },
+    {
+      "id": "chairs",
+      "src": "assets/images/salon-pedicure-enhanced.webp",
+      "alt": "A row of burgundy pedicure chairs inside the salon",
+      "category": "salon",
+      "caption": "Take a seat. Make yourself at home."
+    },
+    {
+      "id": "colorful",
+      "src": "assets/images/nail-art-colorful-enhanced.webp",
+      "alt": "Colorful nail designs shown together by salon guests",
+      "category": "nails",
+      "caption": "So many ways to be you"
+    },
+    {
+      "id": "celebration",
+      "src": "assets/images/salon-celebration-enhanced.webp",
+      "alt": "Friends gathered for a celebration at Fashion Nails & Spa",
+      "category": "community",
+      "caption": "Make it a celebration"
+    },
+    {
+      "id": "red",
+      "src": "assets/images/pedicure-red-enhanced.webp",
+      "alt": "A bright red pedicure photographed at the salon",
+      "category": "pedicure",
+      "caption": "A classic pop of color"
+    },
+    {
+      "id": "floral",
+      "src": "assets/images/nail-art-floral-enhanced.webp",
+      "alt": "A guest showing delicate nail art at Fashion Nails & Spa",
+      "category": "nails",
+      "caption": "The finishing touch"
+    }
   ],
   "promotions": [
-    { "id": "nails-and-go", "title": "Nails & Go", "highlight": "$25", "description": "A little refresh for your day. Call to ask what’s included, check availability, and confirm the current offer before your visit.", "code": "", "enabled": true, "startDate": "", "endDate": "" }
+    {
+      "id": "nails-and-go",
+      "title": "Nails & Go",
+      "highlight": "$25",
+      "description": "A little refresh for your day. Call to ask what’s included, check availability, and confirm the current offer before your visit.",
+      "code": "",
+      "enabled": true,
+      "startDate": "",
+      "endDate": ""
+    }
   ]
 }
