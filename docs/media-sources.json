@@ -1,0 +1,80 @@
+{
+  "source": "Archive.zip (uploaded by user)",
+  "images": [
+    {
+      "asset": "assets/images/salon-colors.jpg",
+      "uploadedFile": "1793603128989_5040336832554875085_g6322614212090226305_299232aa6aa45046c76ad95d9cc83e33.jpg",
+      "sha256": "17a9dafebc733750ff4e908292af15dd9dfb40aa7b4005801377dc26c7d1380b"
+    },
+    {
+      "asset": "assets/images/nail-art-polka.jpg",
+      "uploadedFile": "1793603129073_5040336832554875085_g6322614212090226305_bd03a01d1c5e83f32e27675547ef9962.jpg",
+      "sha256": "d694e05993e7e256dcb6074109e81f9199a57590efa8d4cc3801dcd28bd06418"
+    },
+    {
+      "asset": "assets/images/pedicure-neutral.jpg",
+      "uploadedFile": "1793603129360_5040336832554875085_g6322614212090226305_7b425736ff0d6ed12326c0d842690049.jpg",
+      "sha256": "6dabafbeb76adda729fe99b92c13286a761ee92ee1a724a1c8a4638b79ac7ea3"
+    },
+    {
+      "asset": "assets/images/nail-art-colorful.jpg",
+      "uploadedFile": "1793603129610_5040336832554875085_g6322614212090226305_d4896800fa1ed6dcada194e5d974e73b.jpg",
+      "sha256": "6942eefa37d35a3a354d0abbccbce7f2db3f8ed3e89f75c1bcebfc91b1ef46bf"
+    },
+    {
+      "asset": "assets/images/nail-art-french.jpg",
+      "uploadedFile": "1793603129727_5040336832554875085_g6322614212090226305_c3a030d8529ba494037b6b3e72a560dc.jpg",
+      "sha256": "b8cbfc214fd5debca83cda85a6ce58db3668056287b015a764a4236f1ea3e617"
+    },
+    {
+      "asset": "assets/images/salon-interior.jpg",
+      "uploadedFile": "1793603129803_5040336832554875085_g6322614212090226305_8d4d88ff8b1e1841bd5dc7e91e713b31.jpg",
+      "sha256": "10c87a086b0917c52044b2b27e88e11b8cafa76531378b96644507a65a8d1949"
+    },
+    {
+      "asset": "assets/images/salon-pedicure.jpg",
+      "uploadedFile": "1793603129954_5040336832554875085_g6322614212090226305_7400b23cd69390c67b992c8501a0d6c7.jpg",
+      "sha256": "b5f3bfdfba603c4a0d6f082434de03754fef3314ac46eb66f37bfe21bf668584"
+    },
+    {
+      "asset": "assets/images/nail-art-purple.jpg",
+      "uploadedFile": "1793603130576_5040336832554875085_g6322614212090226305_7d37dc66adc9037f851c69f125f8e53a.jpg",
+      "sha256": "8a4fa88937b5a22f6ab80793a67dbe75bcf94d6dfb6dcc4cbc056f9a765bfa43"
+    },
+    {
+      "asset": "assets/images/pedicure-friends.jpg",
+      "uploadedFile": "1793603130653_5040336832554875085_g6322614212090226305_e9a9b27e62cabbf51f1a5d7ca58c43aa.jpg",
+      "sha256": "37e7d4b13db74a6adbf60e40af3f0edcd4d1f2dbdef1464aa6a9aef546788491"
+    },
+    {
+      "asset": "assets/images/salon-community.jpg",
+      "uploadedFile": "1793603130785_5040336832554875085_g6322614212090226305_1fc007a9652d4be46c4f09b931d1ae1c.jpg",
+      "sha256": "b5b038b696212792b50d1a24433de4da00beedce43938ccd70a7cd898eb4f0b9"
+    },
+    {
+      "asset": "assets/images/nail-art-jewels.jpg",
+      "uploadedFile": "1793603130982_5040336832554875085_g6322614212090226305_21e66539338d1821385e8eb92dec8218.jpg",
+      "sha256": "8810bb07a942e5edc78d658255a5aabfa72c66212767ae4a95833680d487808a"
+    },
+    {
+      "asset": "assets/images/salon-celebration.jpg",
+      "uploadedFile": "1793603131069_5040336832554875085_g6322614212090226305_a5de8423cfae0feb63505fcb528fc482.jpg",
+      "sha256": "9c9315ee8f13b2a82f96f8a16ebf0e3b91a2825b0d018101b089d2bcf76e86f2"
+    },
+    {
+      "asset": "assets/images/nail-art-coral.jpg",
+      "uploadedFile": "1793603131158_5040336832554875085_g6322614212090226305_f06511a8d28bb6fde8d43dc39851035a.jpg",
+      "sha256": "965a6778ca68e7d7164cdd85c57e7aaff29f93a6a60707c0f2cef9180753a6ce"
+    },
+    {
+      "asset": "assets/images/pedicure-red.jpg",
+      "uploadedFile": "1793603131248_5040336832554875085_g6322614212090226305_778e1704c106c4cde675bd42dcef4718.jpg",
+      "sha256": "ed413ab69b4b8a185fea45090af6cacc1ee88ee4737d6c817bbd7e3d7586875d"
+    },
+    {
+      "asset": "assets/images/nail-art-floral.jpg",
+      "uploadedFile": "1793603131353_5040336832554875085_g6322614212090226305_44b30277e656d44a7e0c719f3962077b.jpg",
+      "sha256": "26fbeea3a6b0577daa31dc4ba3382f73c4b127e3095b99523870a66b5e325571"
+    }
+  ]
+}

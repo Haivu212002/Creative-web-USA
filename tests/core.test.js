@@ -1,0 +1,94 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { activePromotions, appointmentSlots, DRAFT_KEY, formatPrice, formatTime, isDate, loadDraft, safeFacebook, safeImage, salonDate, saveDraft, validateContent } from '../assets/js/core.js';
+
+const published = JSON.parse(readFileSync(new URL('../content.json', import.meta.url), 'utf8'));
+const clone = () => structuredClone(published);
+
+test('published content is valid and honors the supplied salon identity', () => {
+  assert.deepEqual(validateContent(published), []);
+  assert.equal(published.contact.phone, '+17172484131');
+  assert.equal(published.contact.address, '8 W. Water St.');
+  assert.equal(published.brand.domain, 'GoFashionNailSpa.com');
+  assert.ok(published.services.every(service => service.price === null && service.duration === null));
+});
+
+test('schema rejects invalid prices, duplicate IDs and image script URLs', () => {
+  const data = clone();
+  data.services[0].price = -5;
+  data.services[1].id = data.services[0].id;
+  data.gallery[0].src = 'javascript:alert(1)';
+  const errors = validateContent(data);
+  assert.ok(errors.some(e => e.includes('giá')));
+  assert.ok(errors.some(e => e.includes('trùng')));
+  assert.ok(errors.some(e => e.includes('đường dẫn ảnh')));
+});
+
+test('unknown categories, malformed schedules, and backwards offer dates are rejected', () => {
+  const data = clone();
+  data.services[0].category = '__proto__';
+  data.hours[0] = { day: 2, open: '19:00', close: '09:00' };
+  data.promotions[0].startDate = '2026-12-01';
+  data.promotions[0].endDate = '2026-11-01';
+  assert.ok(validateContent(data).length >= 4);
+});
+
+test('images support static paths, HTTPS, and raster uploads but exclude unsafe formats', () => {
+  assert.equal(safeImage('assets/images/nail-art-jewels.jpg'), true);
+  assert.equal(safeImage('https://example.com/nails.webp'), true);
+  assert.equal(safeImage('data:image/png;base64,aGVsbG8='), true);
+  for (const image of ['javascript:alert(1)', 'data:image/svg+xml,<svg onload=alert(1)>', '../private.jpg', 'http://example.com/nails.jpg']) assert.equal(safeImage(image), false);
+  assert.equal(safeFacebook('https://www.facebook.com/GoFashionNailSpa'), true);
+  assert.equal(safeFacebook('https://facebook.com.evil.example/test'), false);
+  assert.equal(safeFacebook('https://user:secret@facebook.com/test'), false);
+});
+
+test('calendar dates are real and handled in the salon timezone', () => {
+  assert.equal(isDate('2026-02-30'), false);
+  assert.equal(isDate('2028-02-29'), true);
+  assert.equal(isDate('2026-2-03'), false);
+  assert.equal(salonDate(new Date('2026-11-03T02:00:00Z')), '2026-11-02');
+  assert.equal(salonDate(new Date('2026-07-01T03:00:00Z')), '2026-06-30');
+});
+
+test('appointment planner excludes closed days, past dates, closing time and elapsed slots', () => {
+  const now = new Date('2026-11-03T18:10:00Z'); // Tuesday, 1:10 PM Eastern
+  const slots = appointmentSlots('2026-11-03', published.hours, now);
+  assert.equal(slots[0], '13:30');
+  assert.equal(slots.at(-1), '17:30');
+  assert.ok(!slots.includes('18:00'));
+  assert.deepEqual(appointmentSlots('2026-11-02', published.hours, now), []);
+  assert.deepEqual(appointmentSlots('2026-11-08', published.hours, now), []);
+  assert.deepEqual(appointmentSlots('not-a-date', published.hours, now), []);
+  assert.equal(appointmentSlots('2026-11-05', published.hours, now)[0], '10:30');
+});
+
+test('promotion date boundaries are inclusive and disabled offers stay hidden', () => {
+  const offer = { ...published.promotions[0], startDate: '2026-11-01', endDate: '2026-11-03' };
+  assert.equal(activePromotions([offer], '2026-11-03').length, 1);
+  assert.equal(activePromotions([offer], '2026-11-04').length, 0);
+  assert.equal(activePromotions([{ ...offer, enabled: false }], '2026-11-02').length, 0);
+});
+
+test('draft round-trip validates before replacing the last saved copy', () => {
+  const memory = new Map();
+  const storage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value) };
+  assert.equal(loadDraft(storage), null);
+  saveDraft(published, storage);
+  assert.deepEqual(loadDraft(storage).content, published);
+  const before = storage.getItem(DRAFT_KEY);
+  const broken = clone(); broken.contact.phone = 'invalid';
+  assert.throws(() => saveDraft(broken, storage));
+  assert.equal(storage.getItem(DRAFT_KEY), before);
+  storage.setItem(DRAFT_KEY, '{broken');
+  assert.throws(() => loadDraft(storage));
+});
+
+test('price and time presentation preserve unknown prices and zero dollar services', () => {
+  assert.equal(formatPrice(null), 'Call for pricing');
+  assert.equal(formatPrice(0), '$0');
+  assert.equal(formatPrice(25.5), '$25.50');
+  assert.equal(formatTime('12:00'), '12:00 PM');
+  assert.equal(formatTime('09:30'), '9:30 AM');
+});

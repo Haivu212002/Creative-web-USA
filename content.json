@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "brand": {
+    "name": "Fashion Nails & Spa",
+    "domain": "GoFashionNailSpa.com",
+    "tagline": "Great looks. Good prices. Personal care."
+  },
+  "contact": {
+    "phone": "+17172484131",
+    "phoneDisplay": "(717) 248-4131",
+    "address": "8 W. Water St.",
+    "city": "Lewistown",
+    "state": "PA",
+    "zip": "17044",
+    "facebookName": "GoFashionNails Spa",
+    "facebookUrl": "https://www.facebook.com/GoFashionNailSpa"
+  },
+  "hero": {
+    "eyebrow": "YOUR LITTLE BEAUTY ESCAPE IN LEWISTOWN, PA",
+    "title": "A little polish.",
+    "accent": "A lot of you.",
+    "description": "A fresh set, a favorite color, a moment just for you. Make yourself at home at Fashion Nails & Spa."
+  },
+  "about": {
+    "heading": "Your neighborhood salon. Your kind of beautiful.",
+    "description": "Find us on Water Street in the heart of Lewistown. From a simple polish to a little extra sparkle, we’re here to help you find a look that feels like you. Come on your own, bring a friend, or make it a little celebration."
+  },
+  "gifts": {
+    "heading": "Give a little me-time.",
+    "description": "For birthdays, holidays, thank-yous, or just because. Ask us about gift certificates and let someone special choose their own moment of self-care."
+  },
+  "hours": [
+    { "day": 0, "open": null, "close": null },
+    { "day": 1, "open": null, "close": null },
+    { "day": 2, "open": "12:00", "close": "18:00" },
+    { "day": 3, "open": "12:00", "close": "18:00" },
+    { "day": 4, "open": "10:30", "close": "19:00" },
+    { "day": 5, "open": "10:30", "close": "19:00" },
+    { "day": 6, "open": "09:00", "close": "17:00" }
+  ],
+  "services": [
+    { "id": "manicure", "name": "Manicure", "category": "nails", "description": "A fresh shape, a favorite shade, and a beautifully polished finish.", "price": null, "duration": null, "image": "assets/images/nail-art-polka.jpg" },
+    { "id": "gel-nails", "name": "Gel Nails", "category": "nails", "description": "Glossy color for your everyday style. Ask us about available finishes.", "price": null, "duration": null, "image": "assets/images/nail-art-purple.jpg" },
+    { "id": "nail-art", "name": "Nail Art & Designs", "category": "nails", "description": "A little personality at your fingertips, from playful details to extra sparkle.", "price": null, "duration": null, "image": "assets/images/nail-art-jewels.jpg" },
+    { "id": "pedicure", "name": "Pedicure", "category": "pedicure", "description": "Take a seat and give your feet a little attention and a fresh pop of color.", "price": null, "duration": null, "image": "assets/images/pedicure-neutral.jpg" },
+    { "id": "waxing", "name": "Waxing", "category": "spa", "description": "A finishing touch to your beauty routine. Call to discuss areas and availability.", "price": null, "duration": null, "image": "assets/images/salon-interior.jpg" },
+    { "id": "facial", "name": "Facial Care", "category": "spa", "description": "Make a little room for self-care. Call us to find out about current facial services.", "price": null, "duration": null, "image": "assets/images/salon-pedicure.jpg" }
+  ],
+  "gallery": [
+    { "id": "jewels", "src": "assets/images/nail-art-jewels.jpg", "alt": "Blush pink nails with colorful jewel accents", "category": "nails", "caption": "A little extra sparkle" },
+    { "id": "polka", "src": "assets/images/nail-art-polka.jpg", "alt": "Cream and blush polka-dot nail art photographed inside the salon", "category": "nails", "caption": "Pretty little details" },
+    { "id": "purple", "src": "assets/images/nail-art-purple.jpg", "alt": "Purple manicure with floral accent nails and a Fashion Nails & Spa business card", "category": "nails", "caption": "Pick your happy color" },
+    { "id": "salon", "src": "assets/images/salon-interior.jpg", "alt": "The manicure stations and pedicure chairs at Fashion Nails & Spa", "category": "salon", "caption": "Your Water Street beauty escape" },
+    { "id": "friends", "src": "assets/images/pedicure-friends.jpg", "alt": "Friends showing their colorful pedicures together", "category": "pedicure", "caption": "Better with friends" },
+    { "id": "coral", "src": "assets/images/nail-art-coral.jpg", "alt": "A salon guest showing her coral and patterned nails", "category": "nails", "caption": "A look that’s all you" },
+    { "id": "community", "src": "assets/images/salon-community.jpg", "alt": "A group of guests enjoying a visit to Fashion Nails & Spa", "category": "community", "caption": "Good company, great memories" },
+    { "id": "neutral", "src": "assets/images/pedicure-neutral.jpg", "alt": "A neutral pink pedicure with gold sandals", "category": "pedicure", "caption": "Ready for your next step" },
+    { "id": "french", "src": "assets/images/nail-art-french.jpg", "alt": "A guest showing a light manicure inside the salon", "category": "nails", "caption": "Fresh, simple, beautiful" },
+    { "id": "chairs", "src": "assets/images/salon-pedicure.jpg", "alt": "A row of burgundy pedicure chairs inside the salon", "category": "salon", "caption": "Take a seat. Make yourself at home." },
+    { "id": "colorful", "src": "assets/images/nail-art-colorful.jpg", "alt": "Colorful nail designs shown together by salon guests", "category": "nails", "caption": "So many ways to be you" },
+    { "id": "celebration", "src": "assets/images/salon-celebration.jpg", "alt": "Friends gathered for a celebration at Fashion Nails & Spa", "category": "community", "caption": "Make it a celebration" },
+    { "id": "red", "src": "assets/images/pedicure-red.jpg", "alt": "A bright red pedicure photographed at the salon", "category": "pedicure", "caption": "A classic pop of color" },
+    { "id": "floral", "src": "assets/images/nail-art-floral.jpg", "alt": "A guest showing delicate nail art at Fashion Nails & Spa", "category": "nails", "caption": "The finishing touch" }
+  ],
+  "promotions": [
+    { "id": "nails-and-go", "title": "Nails & Go", "highlight": "$25", "description": "A little refresh for your day. Call to ask what’s included, check availability, and confirm the current offer before your visit.", "code": "", "enabled": true, "startDate": "", "endDate": "" }
+  ]
+}
