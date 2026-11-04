@@ -28,3 +28,9 @@
 /* Keep the neighborhood map near the top of the location pages. */
 #salon-location{scroll-margin-top:110px}.page-home .salon-map-section{padding-top:64px;padding-bottom:64px}.page-contact .salon-map-section{padding-top:48px;padding-bottom:0}.salon-map-preview{height:420px}.salon-map-note a{text-decoration:underline;text-underline-offset:3px;color:var(--wine)}.hero-map-link{font-size:11px;margin-top:22px;gap:9px}.hero-map-link .icon{width:17px;height:17px}
 @media(max-width:700px){#salon-location{scroll-margin-top:90px}.page-home .salon-map-section{padding-top:42px;padding-bottom:42px}.page-contact .salon-map-section{padding-top:32px}.salon-map-preview{height:340px}.hero-map-link{font-size:10px;margin-top:20px}}
+
+/* Let short headings and introductions use the space available to them. */
+.page-intro-copy,.page-gallery .page-intro-copy{max-width:none;min-width:0}.page-intro-copy h1{font-size:clamp(38px,4.5vw,64px);line-height:1.14;letter-spacing:-1.8px;max-width:100%;text-wrap:pretty}.page-intro-copy>p:not(.eyebrow):not(.inspiration-disclosure),.page-gallery .page-intro-copy>p:not(.eyebrow){max-width:none;line-height:1.8}.page-intro-copy h1 em,.journal-content .page-intro h1 em{display:inline-block;max-width:100%}.section-heading h2,.detail-article h2,.detail-visit-card h2{text-wrap:pretty}.journal-content .page-intro h1{font-size:clamp(38px,4.5vw,64px);line-height:1.14}.split-heading>div{min-width:0}.split-heading>p{max-width:none;flex-shrink:1}
+@media(min-width:1001px){.split-heading>p{max-width:38ch;flex-shrink:0}}
+@media(min-width:901px){.page-intro-grid:not(.has-photo) .page-intro-copy h1{max-width:none}.page-intro{padding-top:54px;padding-bottom:56px}}
+@media(max-width:700px){.page-intro-copy h1,.journal-content .page-intro h1{font-size:clamp(36px,5.5vw,38px);letter-spacing:-1px;line-height:1.16}.page-intro-copy>p:not(.eyebrow):not(.inspiration-disclosure){font-size:13px}.split-heading>p{max-width:none;flex-shrink:1}}
