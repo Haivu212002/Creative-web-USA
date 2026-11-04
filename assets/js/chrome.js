@@ -1,6 +1,6 @@
-import { LEGACY_HASH_ROUTES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-mp2';
-import { initEffects, observeEffects } from './effects.js?v=20261104-mp2';
-import { createElement as el, fullAddress } from './core.js?v=20261104-mp2';
+import { LEGACY_HASH_ROUTES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-static';
+import { initEffects, observeEffects } from './effects.js?v=20261104-static';
+import { createElement as el, fullAddress } from './core.js?v=20261104-static';
 
 export function applyBusinessContent(content) {
   document.querySelectorAll('[data-bind]').forEach(node => {
@@ -47,7 +47,15 @@ export function initChrome() {
   if (year) year.textContent = new Date().getFullYear();
   if (previewParameters(location.search).preview) {
     const banner = document.querySelector('#preview-banner');
-    if (banner) banner.hidden = false;
+    if (banner) {
+      const studio = el('a', '', 'Back to content studio');
+      studio.href = 'admin/';
+      banner.append(studio);
+      banner.hidden = false;
+    }
+    const robots = el('meta');
+    robots.name = 'robots'; robots.content = 'noindex';
+    document.head.append(robots);
   }
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('#main-navigation');

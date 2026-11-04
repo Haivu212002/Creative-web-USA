@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { LEGACY_HASH_ROUTES, NAV_PAGES, PAGE_ROUTES, SITE_RELEASE, legacyServiceId, pageHref, previewParameters } from '../assets/js/routes.js';
+import { LEGACY_HASH_ROUTES, NAV_PAGES, PAGE_ROUTES, SITE_RELEASE, SITE_URL, canonicalHref, legacyServiceId, pageHref, previewParameters } from '../assets/js/routes.js';
+import { renderGallery, renderPromotions, renderServices } from '../scripts/static-content.mjs';
 import { activePromotions, appointmentSlots, DRAFT_KEY, formatPrice, formatTime, isDate, loadDraft, safeFacebook, safeImage, salonDate, saveDraft, validateContent } from '../assets/js/core.js';
 
 const published = JSON.parse(readFileSync(new URL('../content.json', import.meta.url), 'utf8'));
@@ -142,4 +143,48 @@ test('old section bookmarks and service aliases map to the current pages', () =>
   assert.equal(PAGE_ROUTES[LEGACY_HASH_ROUTES.contact], 'booking.html');
   assert.equal(legacyServiceId('design'), 'nail-art');
   assert.equal(legacyServiceId('manicure'), 'manicure');
+});
+
+test('canonical URLs use the live Pages address and only preserve parameters that identify content', () => {
+  assert.equal(canonicalHref('home', { v: 'old', preview: 'draft' }), SITE_URL);
+  assert.equal(canonicalHref('gallery', { v: 'old', utm_source: 'facebook' }), `${SITE_URL}gallery.html`);
+  assert.equal(canonicalHref('contact', { service: 'manicure' }), `${SITE_URL}booking.html`);
+  assert.equal(canonicalHref('service', { service: 'nail-art', v: 'old', preview: 'draft' }), `${SITE_URL}service.html?service=nail-art`);
+  assert.throws(() => canonicalHref('unknown'));
+});
+
+test('static content treats salon text as text and shows dated offers without relying on the build date', () => {
+  const text = '<img src=x onerror="alert(1)"> & a quote';
+  const escaped = '&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; a quote';
+  const service = { ...published.services[0], name: text, description: text };
+  const photo = { ...published.gallery[0], caption: text, alt: text };
+  const offer = { ...published.promotions[0], title: text, startDate: '2026-11-01', endDate: '2026-11-04' };
+  for (const html of [renderServices([service]), renderGallery([photo]), renderPromotions([offer], published.contact)]) {
+    assert.ok(!html.includes(text));
+    assert.ok(html.includes(escaped));
+    assert.ok(!html.includes('<img src=x'));
+  }
+  const dated = renderPromotions([offer], published.contact);
+  assert.ok(dated.includes('From Nov 1, 2026 · Until Nov 4, 2026'));
+  assert.ok(dated.includes('Applies only within these dates'));
+  assert.ok(!renderPromotions([{ ...offer, enabled: false }], published.contact).includes(escaped));
+});
+
+test('published HTML contains the full menu, photos and offer plus clean canonicals and no admin links', () => {
+  const html = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+  const services = html(PAGE_ROUTES.services);
+  assert.equal((services.match(/class="service-card"/g) || []).length, published.services.length);
+  assert.equal((services.match(/Call for pricing/g) || []).length, published.services.length);
+  for (const service of published.services) assert.ok(services.includes(`service.html?service=${service.id}&amp;v=`));
+  const gallery = html(PAGE_ROUTES.gallery);
+  for (const photo of published.gallery) assert.ok(gallery.includes(`src="${photo.src}"`));
+  assert.ok(gallery.includes('<details id="gallery-static-more"'));
+  assert.ok(html(PAGE_ROUTES.specials).includes('<h3>Nails &amp; Go</h3><div class="promotion-highlight">$25</div>'));
+  for (const [page, file] of Object.entries(PAGE_ROUTES)) {
+    const source = html(file);
+    assert.equal((source.match(/rel="canonical"/g) || []).length, 1, file);
+    assert.ok(source.includes(`<link rel="canonical" href="${canonicalHref(page)}">`), file);
+    assert.ok(!source.includes('href="admin/"'), file);
+    assert.ok(!/\{\{[A-Z_]+\}\}/.test(source), file);
+  }
 });

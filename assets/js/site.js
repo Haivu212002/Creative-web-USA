@@ -1,7 +1,7 @@
-import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js?v=20261104-mp2';
-import { observeEffects } from './effects.js?v=20261104-mp2';
-import { PAGE_LABELS, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-mp2';
-import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js?v=20261104-mp2';
+import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js?v=20261104-static';
+import { observeEffects } from './effects.js?v=20261104-static';
+import { PAGE_LABELS, SITE_URL, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-static';
+import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js?v=20261104-static';
 
 let content;
 let serviceFilter = 'all';
@@ -102,6 +102,7 @@ function renderGallery() {
     button.append(image, caption); button.addEventListener('click', () => openLightbox(index, button)); grid.append(button);
   });
   if ($('#gallery-more')) $('#gallery-more').hidden = showAllPhotos || lightboxPhotos.length <= limit;
+  $('#gallery-static-more')?.remove();
   observeEffects(grid);
 }
 
@@ -188,7 +189,7 @@ function addStructuredData() {
   script.id = 'salon-structured-data';
   script.textContent = JSON.stringify({
     '@context': 'https://schema.org', '@type': 'NailSalon', name: content.brand.name,
-    url: `https://${content.brand.domain.toLowerCase()}/`, telephone: content.contact.phone,
+    url: SITE_URL, telephone: content.contact.phone,
     address: { '@type': 'PostalAddress', streetAddress: content.contact.address, addressLocality: content.contact.city, addressRegion: content.contact.state, postalCode: content.contact.zip, addressCountry: 'US' },
     sameAs: [content.contact.facebookUrl],
     openingHoursSpecification: content.hours.filter(day => day.open).map(day => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: `https://schema.org/${DAYS[day.day]}`, opens: day.open, closes: day.close })),
@@ -200,6 +201,7 @@ function addStructuredData() {
 function setupInteractions() {
   for (const [id, callback] of [['service-filters', value => { serviceFilter = value; renderServices(); }], ['gallery-filters', value => { galleryFilter = value; showAllPhotos = false; renderGallery(); }]]) {
     const group = $(`#${id}`);
+    if (group) group.hidden = false;
     group?.addEventListener('click', event => {
       const button = event.target.closest('[data-filter]');
       if (!button) return;
@@ -256,7 +258,7 @@ async function init() {
     setupInteractions();
   } catch (error) {
     console.error(error);
-    $('#site-notice').textContent = 'The service menu and photo gallery could not be loaded. Please refresh, or call (717) 248-4131 for services and appointments.';
+    $('#site-notice').textContent = 'Some interactive features could not be loaded. Please use the published information on this page, refresh, or call (717) 248-4131 for services and appointments.';
     $('#site-notice').hidden = false;
     if ($('#visit-form')) $('#visit-form').hidden = true;
     if ($('#gallery-more')) $('#gallery-more').hidden = true;

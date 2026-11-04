@@ -1,4 +1,5 @@
-export const SITE_RELEASE = '20261104-mp2';
+export const SITE_RELEASE = '20261104-static';
+export const SITE_URL = 'https://haivu212002.github.io/Creative-web-USA/';
 
 export const PAGE_ROUTES = Object.freeze({
   home: 'index.html',
@@ -36,6 +37,14 @@ export function pageHref(page, parameters = {}) {
   }
   query.set('v', SITE_RELEASE);
   return PAGE_ROUTES[page] + (query.size ? `?${query}` : '');
+}
+
+export function canonicalHref(page, parameters = {}) {
+  if (!Object.hasOwn(PAGE_ROUTES, page)) throw new Error(`Unknown website page: ${page}`);
+  const url = new URL(page === 'home' ? '' : PAGE_ROUTES[page], SITE_URL);
+  // A service ID identifies distinct content. Preview, cache and planner parameters do not.
+  if (page === 'service' && parameters.service) url.searchParams.set('service', parameters.service);
+  return url.href;
 }
 
 export function previewParameters(search = '') {

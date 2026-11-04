@@ -1,7 +1,7 @@
-import { applyBusinessContent, initChrome } from './chrome.js?v=20261104-mp2';
-import { observeEffects } from './effects.js?v=20261104-mp2';
-import { pageHref, previewParameters } from './routes.js?v=20261104-mp2';
-import { CATEGORIES, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js?v=20261104-mp2';
+import { applyBusinessContent, initChrome } from './chrome.js?v=20261104-static';
+import { observeEffects } from './effects.js?v=20261104-static';
+import { canonicalHref, pageHref, previewParameters } from './routes.js?v=20261104-static';
+import { CATEGORIES, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js?v=20261104-static';
 
 const $ = selector => document.querySelector(selector);
 const params = new URLSearchParams(location.search);
@@ -49,6 +49,9 @@ function renderService(service, content) {
   observeEffects();
   document.title = `${service.name} | ${content.brand.name} · ${contact.city}, ${contact.state}`;
   $('meta[name="description"]').content = `${service.name} at ${content.brand.name} in ${contact.city}, ${contact.state}. ${service.description} Call ${contact.phoneDisplay} for pricing and appointments.`;
+  const canonical = canonicalHref('service', { service: service.id });
+  $('link[rel="canonical"]').href = canonical;
+  $('meta[property="og:url"]').content = canonical;
   const schema = { '@context': 'https://schema.org', '@type': 'Service', name: service.name, description: service.details || service.description, serviceType: CATEGORIES[service.category], provider: { '@type': 'NailSalon', name: content.brand.name, telephone: contact.phone, address: { '@type': 'PostalAddress', streetAddress: contact.address, addressLocality: contact.city, addressRegion: contact.state, postalCode: contact.zip, addressCountry: 'US' } } };
   if (service.price !== null) schema.offers = { '@type': 'Offer', price: service.price, priceCurrency: 'USD' };
   const structured = el('script'); structured.type = 'application/ld+json'; structured.id = 'service-structured-data'; structured.textContent = JSON.stringify(schema); document.head.append(structured);

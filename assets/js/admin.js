@@ -1,5 +1,5 @@
-import { pageHref } from './routes.js?v=20261104-mp2';
-import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js?v=20261104-mp2';
+import { pageHref } from './routes.js?v=20261104-static';
+import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js?v=20261104-static';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
@@ -380,7 +380,7 @@ function setupActions() {
     const url = URL.createObjectURL(new Blob([`${JSON.stringify(content, null, 2)}\n`], { type: 'application/json' }));
     const a = el('a'); a.href = url; a.download = 'content.json'; document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    report('Đã xuất content.json. Đưa file vào repository và triển khai để cập nhật website công khai.');
+    report('Đã xuất content.json. Đưa file vào repository, chạy npm run build rồi triển khai cùng các HTML được tạo để cập nhật website công khai.');
   });
   $('#import-label').addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); $('#import-file').click(); } });
   $('#import-file').addEventListener('change', async () => {

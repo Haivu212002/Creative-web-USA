@@ -140,7 +140,7 @@ class WebsiteTests(unittest.TestCase):
             expect(page.locator('body')).to_have_attribute('data-page', key)
             expect(page.locator('#main-navigation a[aria-current="page"]')).to_have_attribute('href', re.compile(re.escape(file) + r'(?:\?.*)?$'))
             expect(page.locator('h1')).to_have_count(1)
-            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-mp2'])
+            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-static'])
             titles.add(page.title())
             self.assertTrue(all(not href.startswith('#') for href in page.locator('#main-navigation a').evaluate_all('(nodes) => nodes.map(node => node.getAttribute("href"))')))
         self.assertEqual(len(titles), 7)
@@ -185,6 +185,82 @@ class WebsiteTests(unittest.TestCase):
         page.get_by_role('link', name='Plan a visit for Waxing', exact=True).click()
         self.assert_page_url(page, f'{self.url}/booking.html?service=waxing')
         expect(page.locator('#visit-service')).to_have_value('waxing')
+
+    def test_published_menu_photos_and_offer_work_without_javascript(self):
+        context = self.browser.new_context(java_script_enabled=False, reduced_motion='reduce', viewport={'width': 1440, 'height': 1000})
+        try:
+            page = context.new_page()
+            response = page.goto(f'{self.url}/Creative-web-USA/services.html?v=old&preview=draft')
+            self.assertEqual(response.status, 200)
+            self.assertIn('class="service-card"', response.text())
+            expect(page.locator('.service-card')).to_have_count(len(DATA['services']))
+            expect(page.locator('.service-price')).to_have_text(['Call for pricing'] * len(DATA['services']))
+            for service in DATA['services']:
+                expect(page.get_by_role('heading', name=service['name'], exact=True)).to_be_visible()
+                link = page.get_by_role('link', name=f"View details for {service['name']}", exact=True)
+                self.assertEqual(parse_qs(urlsplit(link.get_attribute('href')).query)['service'], [service['id']])
+            expect(page.locator('#service-filters')).not_to_be_visible()
+            expect(page.locator('#preview-banner')).not_to_be_visible()
+            expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', 'https://haivu212002.github.io/Creative-web-USA/services.html')
+
+            response = page.goto(f'{self.url}/Creative-web-USA/gallery.html')
+            for photo in DATA['gallery']:
+                self.assertIn(f'src="{photo["src"]}"', response.text())
+            expect(page.locator('#gallery-grid > a.gallery-item')).to_have_count(8)
+            expect(page.locator('#gallery-static-more .gallery-item')).to_have_count(len(DATA['gallery']) - 8)
+            expect(page.locator('#gallery-filters')).not_to_be_visible()
+            expect(page.locator('#gallery-more')).not_to_be_visible()
+            page.locator('#gallery-static-more > summary').click()
+            expect(page.locator('#gallery-static-more .gallery-item').first).to_be_visible()
+            self.eager_images(page)
+            page.screenshot(path=str(RESULTS / 'gallery-without-javascript.png'), full_page=True)
+            with page.expect_navigation() as navigation:
+                page.locator('#gallery-static-more .gallery-item').first.click()
+            self.assertEqual(navigation.value.status, 200)
+            self.assertTrue(navigation.value.headers['content-type'].startswith('image/'))
+
+            response = page.goto(f'{self.url}/Creative-web-USA/offers.html')
+            self.assertIn('<h3>Nails &amp; Go</h3>', response.text())
+            expect(page.locator('#promotions h3')).to_have_text('Nails & Go')
+            expect(page.locator('#promotions .promotion-highlight')).to_have_text('$25')
+            expect(page.locator('#promotions a')).to_have_attribute('href', 'tel:+17172484131')
+            expect(page.locator('.site-footer a[href*="admin"]')).to_have_count(0)
+            page.screenshot(path=str(RESULTS / 'offers-without-javascript.png'), full_page=True)
+            page.set_viewport_size({'width': 390, 'height': 844})
+            expect(page.locator('#promotions .promotion-highlight')).to_be_visible()
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), 390)
+        finally:
+            context.close()
+
+    def test_published_html_survives_a_failed_content_request(self):
+        page = self.page
+        page.route('**/content.json', lambda route: route.abort())
+        for file, selector, count in [('services.html', '.service-card', 6), ('gallery.html', 'a.gallery-item', 14), ('offers.html', '#promotions .promotion-card', 1), ('about.html', '#gallery-grid a.gallery-item', 2)]:
+            page.goto(f'{self.url}/Creative-web-USA/{file}')
+            expect(page.locator('#site-notice')).to_be_visible()
+            expect(page.locator(selector)).to_have_count(count)
+            expect(page.locator('.site-footer a[href*="admin"]')).to_have_count(0)
+            if file == 'services.html':
+                expect(page.locator('#service-filters')).not_to_be_visible()
+            elif file == 'gallery.html':
+                expect(page.locator('#gallery-filters')).not_to_be_visible()
+                expect(page.locator('#gallery-more')).not_to_be_visible()
+                page.locator('#gallery-static-more > summary').click()
+                expect(page.locator('#gallery-static-more .gallery-item').first).to_be_visible()
+            elif file == 'offers.html':
+                expect(page.locator('#promotions .promotion-highlight')).to_have_text('$25')
+
+    def test_canonicals_ignore_cache_preview_and_tracking_parameters(self):
+        page = self.open_public(suffix='Creative-web-USA/services.html?v=old&preview=draft&utm_source=facebook')
+        expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', 'https://haivu212002.github.io/Creative-web-USA/services.html')
+        expect(page.locator('meta[name="robots"]')).to_have_attribute('content', 'noindex')
+        expect(page.locator('#preview-banner a')).to_have_attribute('href', 'admin/')
+        expect(page.locator('.site-footer a[href*="admin"]')).to_have_count(0)
+        page = self.open_public(suffix='Creative-web-USA/service.html?service=nail-art&v=old&preview=draft&utm_source=facebook')
+        canonical = 'https://haivu212002.github.io/Creative-web-USA/service.html?service=nail-art'
+        expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', canonical)
+        expect(page.locator('meta[property="og:url"]')).to_have_attribute('content', canonical)
+        expect(page.locator('#service-name')).to_have_text(next(service['name'] for service in DATA['services'] if service['id'] == 'nail-art'))
 
     def test_gallery_filter_more_and_accessible_lightbox(self):
         page = self.open_public(suffix='gallery.html')

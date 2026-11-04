@@ -12,7 +12,7 @@ Từ `/workspace/Creative-web-USA`:
 npm start
 ```
 
-Lệnh này dùng Python 3 để phục vụ file qua HTTP, cổng 4173. Có thể chạy trực tiếp `python3 -m http.server 4173 --bind 0.0.0.0`. Không cần `npm install`. Khi chỉnh template trong `templates/`, chạy `npm run build` để tạo lại các file HTML; `npm run check` kiểm tra các file đã đồng bộ với template. Mở trang gốc cho website và đường dẫn `admin/` cho Content Studio. Các module JavaScript cần HTTP; không mở bằng `file://`.
+Lệnh này dùng Python 3 để phục vụ file qua HTTP, cổng 4173. Có thể chạy trực tiếp `python3 -m http.server 4173 --bind 0.0.0.0`. Không cần `npm install`. Khi chỉnh template trong `templates/` hoặc `content.json`, chạy `npm run build` để tạo lại các file HTML; `npm run check` kiểm tra các file đã đồng bộ với template. Mở trang gốc cho website và đường dẫn `admin/` cho Content Studio. Các module JavaScript cần HTTP; không mở bằng `file://`.
 
 ```sh
 npm run check
@@ -24,7 +24,7 @@ Kiểm tra logic dùng Node.js >=20. Kiểm tra trình duyệt dùng Python, th�
 
 ## Cấu trúc
 
-- `index.html`: Home, chỉ giới thiệu và xem nhanh dịch vụ/ảnh.
+- `index.html`: Home, giới thiệu salon và liên kết sang Services, Gallery, Booking.
 - `services.html`: Services & Prices, đầy đủ menu dịch vụ và bộ lọc.
 - `gallery.html`: Gallery, bộ lọc, xem thêm và lightbox.
 - `offers.html`: Specials & Rewards.
@@ -65,7 +65,7 @@ Studio là công cụ chỉnh **bản nháp cục bộ**, không phải backend 
 2. Bản nháp nằm trong `localStorage`, khóa `fashion-nails.content-draft.v1`. Chỉ tồn tại trên cùng trình duyệt và origin; có thể mất khi xóa dữ liệu trình duyệt.
 3. “Xem trước” mở trang phù hợp với mục đang chỉnh (ví dụ `services.html?preview=draft` hoặc `gallery.html?preview=draft`) và có banner nhận diện. Tham số bản nháp được giữ khi đi qua menu và trang chi tiết. Khách truy cập bình thường vẫn đọc file công khai; bản nháp không tự trở thành nội dung công khai.
 4. “Xuất content.json” tải một bản sao. “Nhập JSON” kiểm tra schema và yêu cầu xác nhận trước khi thay bản nháp. Hai tab cùng sửa sẽ được cảnh báo và chặn ghi đè từ tab cũ.
-5. Để đưa nội dung lên website, sao lưu file cũ, kiểm tra diff, thay `content.json` bằng file đã xuất rồi triển khai repository. Studio không có token GitHub và không tự push.
+5. Để đưa nội dung lên website, sao lưu file cũ, kiểm tra diff, thay `content.json` bằng file đã xuất, chạy `npm run build` và `npm run check`, rồi commit cả JSON và các HTML được tạo trước khi triển khai repository. Studio không có token GitHub và không tự push.
 
 Ảnh mới có thể dùng đường dẫn `assets/images/ten-anh.jpg`, URL HTTPS, hoặc tải ảnh raster tối đa 700 KB/ảnh để nhúng trong bản nháp/JSON. Không chấp nhận SVG/script URL. Dung lượng `localStorage` bị giới hạn: ưu tiên đưa ảnh vào `assets/images/` và dùng đường dẫn nếu gallery lớn. Ảnh được nhúng chỉ có trong file JSON sau khi xuất; không được upload lên cloud.
 
@@ -83,7 +83,7 @@ Gift certificates hiện hướng khách gọi hoặc ghé salon để mua; khô
 
 ## GitHub Pages và bảo toàn code
 
-Tất cả URL nội bộ dùng đường dẫn tương đối để chạy được ở cả `/` và `/Creative-web-USA/`. File `.nojekyll` cho phép phục vụ trực tiếp file tĩnh. Chạy `npm run build` khi sửa các template, rồi commit cả nguồn và HTML được tạo. Không cần build trên máy chủ: GitHub Pages dùng các file HTML đã commit; tác vụ Pages tự chạy khi cập nhật `gh-pages`.
+Tất cả URL nội bộ dùng đường dẫn tương đối để chạy được ở cả `/` và `/Creative-web-USA/`. File `.nojekyll` cho phép phục vụ trực tiếp file tĩnh. Chạy `npm run build` khi sửa template hoặc `content.json`, rồi commit cả nguồn và HTML được tạo. Không cần build trên máy chủ: GitHub Pages dùng các file HTML đã commit; tác vụ Pages tự chạy khi cập nhật `gh-pages`.
 
 Checkout ban đầu chỉ có README tại `f7db62f`, nhánh `work`. Khi chuẩn bị xuất bản ngày 03/11/2026, GitHub đã được đọc thành công bằng lệnh có quyền truy cập mạng qua proxy. Đã xác minh `main` còn ở `f7db62f`, còn `gh-pages` ở `1d6f42cf1dc1ff5dbb76fecf61e39c7391cb6d07`, chứa 21 file của demo cũ. GitHub Actions hiển thị Pages build/deployment thành công cho nhánh `gh-pages` từ bản demo trước.
 
@@ -100,3 +100,9 @@ Bảy menu chính trỏ đến bảy file HTML thật, không cuộn giữa các
 Hiệu ứng dùng CSS và IntersectionObserver: banner xuất hiện nhẹ, ảnh phóng khi hover, thẻ nổi, phần nội dung xuất hiện khi cuộn, menu điện thoại chuyển động, lightbox mở nhẹ, thanh tiến độ đọc và nút về đầu trang. Trình duyệt hỗ trợ có chuyển cảnh tài liệu bằng View Transitions; trình duyệt khác điều hướng bình thường. Không chặn liên kết để giả lập đổi trang. Hiệu ứng tôn trọng `prefers-reduced-motion`, và nội dung vẫn hiện khi không có JavaScript hoặc IntersectionObserver.
 
 Bộ kiểm tra trình duyệt xác minh riêng các điều hướng có HTTP document response, lịch sử Back/Forward, toàn bộ trang chính trên desktop/mobile, menu khi tắt JavaScript, ảnh/dịch vụ, booking, dữ liệu bản nháp và chuyển động thường/giảm chuyển động.
+
+## Nội dung HTML và canonical
+
+Build kiểm tra schema rồi tạo sẵn toàn bộ sáu dịch vụ, 14 ảnh gallery và ưu đãi đang bật từ `content.json` trong HTML. Gallery dùng liên kết ảnh và `<details>` để xem thêm khi tắt JavaScript; khi JavaScript tải được dữ liệu, bộ lọc và lightbox thay thế các liên kết này. Nếu tải JSON lỗi, nội dung HTML vẫn giữ nguyên và các nút lọc không hoạt động được ẩn. Ưu đãi có lịch ghi rõ ngày áp dụng trong HTML; JavaScript chỉ hiển thị ưu đãi đang hiệu lực theo giờ salon. Tạo HTML không phụ thuộc ngày chạy build.
+
+Mỗi trang có một canonical tuyệt đối về địa chỉ GitHub Pages hiện đang xuất bản, bỏ `v`, `preview` và tham số theo dõi. Trang chi tiết giữ `service` để phân biệt các dịch vụ khi đã tải dữ liệu hợp lệ. Tên miền GoFashionNailSpa.com vẫn là thông tin hiển thị; khi kết nối tên miền thật, cập nhật `SITE_URL` trong `assets/js/routes.js` rồi build lại. Link Content Studio đã được gỡ khỏi footer công khai; banner quay về Studio chỉ tạo khi xem bản nháp. Đường dẫn `admin/` vẫn truy cập trực tiếp được, có `noindex,nofollow`, và không cung cấp xác thực máy chủ.
