@@ -19,7 +19,7 @@ const offerNames = published.promotions.filter(offer => offer.enabled).map(offer
 const descriptions = {
   home: 'Your little beauty escape in Lewistown. Nails, pedicures, waxing and facial care at 8 W. Water St. Call (717) 248-4131.',
   services: 'Explore manicures, gel nails, nail art, pedicures, waxing and facial care. See each service and call Fashion Nails & Spa for pricing.',
-  gallery: 'Explore our salon photo collection, nail designs, pedicures and moments with friends at Fashion Nails & Spa in Lewistown.',
+  gallery: 'Explore nail style inspiration, salon photos, pedicures and moments with friends at Fashion Nails & Spa in Lewistown.',
   specials: offerNames.length ? `Explore ${offerNames.join(', ')} at Fashion Nails & Spa. Check offer dates and call to confirm terms and availability.` : 'Ask about salon offers, coupons and rewards at Fashion Nails & Spa. Call to confirm current availability and details.',
   about: 'Meet your neighborhood beauty escape on Water Street in Lewistown, PA. Discover the salon and the moments that make it personal.',
   gifts: 'Give a little me-time. Ask Fashion Nails & Spa about gift certificates for birthdays, holidays and thoughtful surprises.',
@@ -38,11 +38,12 @@ async function emit(file, contents) {
 
 for (const [page, file] of Object.entries(PAGE_ROUTES)) {
   const fragment = await read(`templates/pages/${page}.html`);
-  const photos = page === 'about' ? published.gallery.filter(photo => photo.category === 'community').slice(0, 2) : published.gallery;
+  const photos = page === 'about' ? published.gallery.filter(photo => photo.category === 'community').slice(0, 2) : published.gallery.filter(photo => photo.category !== 'inspiration');
   const contentTokens = {
     SERVICES_CONTENT: () => renderServices(published.services),
     GALLERY_CONTENT: () => renderGallery(photos.slice(0, 8)),
     GALLERY_MORE: () => renderGalleryMore(photos.slice(8)),
+    INSPIRATION_CONTENT: () => renderGallery(published.gallery.filter(photo => photo.category === 'inspiration')),
     PROMOTIONS_CONTENT: () => renderPromotions(published.promotions, published.contact),
   };
   const content = fragment.replace(/\{\{([A-Z_]+)\}\}/g, (_, key) => {

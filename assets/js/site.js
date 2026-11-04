@@ -1,7 +1,7 @@
-import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js?v=20261104-static';
-import { observeEffects } from './effects.js?v=20261104-static';
-import { PAGE_LABELS, SITE_URL, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-static';
-import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js?v=20261104-static';
+import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js?v=20261104-gallery';
+import { observeEffects } from './effects.js?v=20261104-gallery';
+import { PAGE_LABELS, SITE_URL, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-gallery';
+import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js?v=20261104-gallery';
 
 let content;
 let serviceFilter = 'all';
@@ -33,6 +33,7 @@ function applyContent() {
   document.title = page === 'home' ? `${content.brand.name} | Nail Salon in ${c.city}, ${c.state}` : `${PAGE_LABELS[page] || 'Fashion Nails & Spa'} | ${content.brand.name} · ${c.city}, ${c.state}`;
   if ($('#service-grid')) renderServices();
   if ($('#gallery-grid')) renderGallery();
+  if ($('#inspiration-grid')) renderInspiration();
   if ($('#promotions')) renderPromotions();
   if ($('#hours-list')) renderHours();
   if ($('#visit-service')) {
@@ -90,8 +91,8 @@ function renderGallery() {
   const grid = $('#gallery-grid');
   const category = galleryFilter === 'all' ? grid.dataset.category || 'all' : galleryFilter;
   const limit = Number(grid.dataset.limit || 8);
-  lightboxPhotos = content.gallery.filter(photo => category === 'all' || photo.category === category);
-  const displayed = showAllPhotos ? lightboxPhotos : lightboxPhotos.slice(0, limit);
+  const photos = content.gallery.filter(photo => photo.category !== 'inspiration' && (category === 'all' || photo.category === category));
+  const displayed = showAllPhotos ? photos : photos.slice(0, limit);
   grid.replaceChildren();
   if (!displayed.length) grid.append(el('p', 'empty-state', 'More salon moments are on their way. Please check back soon.'));
   displayed.forEach((photo, index) => {
@@ -99,10 +100,27 @@ function renderGallery() {
     button.setAttribute('aria-label', `View photo: ${photo.caption || photo.alt}`);
     const image = el('img'); image.src = photo.src; image.alt = photo.alt; image.loading = 'lazy'; image.width = 600; image.height = 750;
     const caption = el('span', 'gallery-caption'); caption.append(el('span', '', photo.caption), arrow());
-    button.append(image, caption); button.addEventListener('click', () => openLightbox(index, button)); grid.append(button);
+    button.append(image, caption); button.addEventListener('click', () => openLightbox(index, button, photos)); grid.append(button);
   });
-  if ($('#gallery-more')) $('#gallery-more').hidden = showAllPhotos || lightboxPhotos.length <= limit;
+  if ($('#gallery-more')) $('#gallery-more').hidden = showAllPhotos || photos.length <= limit;
   $('#gallery-static-more')?.remove();
+  observeEffects(grid);
+}
+
+function renderInspiration() {
+  const grid = $('#inspiration-grid');
+  const photos = content.gallery.filter(photo => photo.category === 'inspiration');
+  $('#style-inspiration').hidden = photos.length === 0;
+  grid.replaceChildren();
+  for (const [index, photo] of photos.entries()) {
+    const button = el('button', 'gallery-item'); button.type = 'button';
+    button.setAttribute('aria-label', `View style inspiration: ${photo.caption || photo.alt}`);
+    const image = el('img'); image.src = photo.src; image.alt = photo.alt; image.loading = 'lazy'; image.width = 960; image.height = 960;
+    const caption = el('span', 'gallery-caption'); caption.append(el('span', '', photo.caption), arrow());
+    button.append(image, caption);
+    button.addEventListener('click', () => openLightbox(index, button, photos));
+    grid.append(button);
+  }
   observeEffects(grid);
 }
 
@@ -110,13 +128,14 @@ function updateLightbox() {
   const photo = lightboxPhotos[lightboxIndex];
   $('#lightbox-image').src = photo.src;
   $('#lightbox-image').alt = photo.alt;
-  $('#lightbox-caption').textContent = photo.caption || photo.alt;
+  $('#lightbox-caption').textContent = (photo.caption || photo.alt) + (photo.category === 'inspiration' ? ' · AI-created style inspiration' : '');
   $('#lightbox-count').textContent = `${lightboxIndex + 1} / ${lightboxPhotos.length}`;
   $('#lightbox-prev').disabled = lightboxPhotos.length < 2;
   $('#lightbox-next').disabled = lightboxPhotos.length < 2;
 }
 
-function openLightbox(index, trigger) {
+function openLightbox(index, trigger, photos) {
+  lightboxPhotos = photos;
   lightboxTrigger = trigger;
   lightboxIndex = index;
   updateLightbox();

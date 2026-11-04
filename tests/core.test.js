@@ -119,7 +119,7 @@ test('displayed salon photos use verified enhanced files and original photograph
     assert.ok(safeImage(edit.enhanced));
   }
   const enhanced = new Set(edits.images.map(image => image.enhanced));
-  const displayed = [...published.services.map(service => service.image), ...published.gallery.map(image => image.src)];
+  const displayed = [...published.services.map(service => service.image), ...published.gallery.filter(image => image.category !== 'inspiration').map(image => image.src)];
   assert.ok(displayed.every(image => enhanced.has(image)));
 });
 
@@ -129,6 +129,21 @@ test('the seven main menus resolve to distinct physical HTML pages', () => {
   assert.equal(new Set(files).size, 7);
   assert.ok(files.every(file => file.endsWith('.html') && !file.includes('#')));
   for (const file of files) assert.ok(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8').includes('<main id="main"'));
+});
+
+test('generated nail inspiration has a separate category, provenance and verified local files', () => {
+  const manifest = JSON.parse(readFileSync(new URL('../docs/media-inspiration.json', import.meta.url), 'utf8'));
+  const photos = published.gallery.filter(photo => photo.category === 'inspiration');
+  assert.equal(photos.length, 6);
+  assert.equal(manifest.pinterestImagesUsed, false);
+  assert.equal(manifest.images.length, photos.length);
+  for (const photo of photos) {
+    const entry = manifest.images.find(image => image.asset === photo.src);
+    assert.ok(entry);
+    assert.ok(photo.alt.startsWith('AI-created'));
+    assert.ok(safeImage(photo.src));
+    assert.equal(createHash('sha256').update(readFileSync(new URL(`../${photo.src}`, import.meta.url))).digest('hex'), entry.sha256);
+  }
 });
 
 test('page links preserve preview and chosen service with safe query encoding', () => {

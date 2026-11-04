@@ -1,6 +1,6 @@
-import { LEGACY_HASH_ROUTES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-static';
-import { initEffects, observeEffects } from './effects.js?v=20261104-static';
-import { createElement as el, fullAddress } from './core.js?v=20261104-static';
+import { LEGACY_HASH_ROUTES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-gallery';
+import { initEffects, observeEffects } from './effects.js?v=20261104-gallery';
+import { createElement as el, fullAddress } from './core.js?v=20261104-gallery';
 
 export function applyBusinessContent(content) {
   document.querySelectorAll('[data-bind]').forEach(node => {
@@ -15,6 +15,15 @@ export function applyBusinessContent(content) {
   document.querySelectorAll('[data-full-address]').forEach(node => { node.textContent = fullAddress(c); });
   document.querySelectorAll('[data-address]').forEach(node => { node.replaceChildren(document.createTextNode(c.address), el('br'), document.createTextNode(`${c.city}, ${c.state} ${c.zip}`)); });
   document.querySelectorAll('[data-map-link]').forEach(link => { link.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress(c))}`; });
+  document.querySelectorAll('[data-map-embed]').forEach(frame => {
+    const address = fullAddress(c);
+    if (new URL(frame.src).searchParams.get('q') !== address) {
+      const url = new URL('https://maps.google.com/maps');
+      url.search = new URLSearchParams({ q: address, z: '16', hl: 'en', output: 'embed' });
+      frame.src = url.href;
+    }
+    frame.title = `Map of the neighborhood around ${content.brand.name}, ${c.city}`;
+  });
   document.querySelectorAll('[data-facebook-link]').forEach(link => { link.href = c.facebookUrl; });
   document.querySelectorAll('[data-facebook-name]').forEach(node => { node.textContent = c.facebookName; });
 }

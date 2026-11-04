@@ -244,6 +244,48 @@
       "alt": "A guest showing delicate nail art at Fashion Nails & Spa",
       "category": "nails",
       "caption": "The finishing touch"
+    },
+    {
+      "id": "inspiration-french",
+      "src": "assets/images/inspiration-french.webp",
+      "alt": "AI-created nail style inspiration: A modern French manicure on healthy medium-short almond-shaped nails: translucent milky pink base, exceptionally crisp thin ivory white tips.",
+      "category": "inspiration",
+      "caption": "Modern French"
+    },
+    {
+      "id": "inspiration-cherry",
+      "src": "assets/images/inspiration-cherry.webp",
+      "alt": "AI-created nail style inspiration: A classic rich cherry-red glossy manicure on healthy short squoval-shaped nails. Smooth solid opaque red, no nail art, clean refined elegance.",
+      "category": "inspiration",
+      "caption": "Cherry red"
+    },
+    {
+      "id": "inspiration-glazed",
+      "src": "assets/images/inspiration-glazed.webp",
+      "alt": "AI-created nail style inspiration: A soft blush pink glazed pearl manicure on healthy medium almond-shaped nails, subtle translucent pearlescent finish, gentle champagne reflections.",
+      "category": "inspiration",
+      "caption": "Soft glaze"
+    },
+    {
+      "id": "inspiration-lavender",
+      "src": "assets/images/inspiration-lavender.webp",
+      "alt": "AI-created nail style inspiration: A delicate soft lavender manicure on healthy short rounded nails, just one tiny delicate white daisy accent with a pale yellow center, very minimal floral nail art.",
+      "category": "inspiration",
+      "caption": "Lilac bloom"
+    },
+    {
+      "id": "inspiration-gold",
+      "src": "assets/images/inspiration-gold.webp",
+      "alt": "AI-created nail style inspiration: A warm sheer nude manicure on healthy medium oval-shaped nails, very fine delicate curved metallic gold lines on two accent nails, minimalist wearable nail design.",
+      "category": "inspiration",
+      "caption": "Golden detail"
+    },
+    {
+      "id": "inspiration-blue",
+      "src": "assets/images/inspiration-blue.webp",
+      "alt": "AI-created nail style inspiration: A muted powder blue and ivory manicure on healthy short rounded nails, alternating solid powder blue and sheer ivory nails with a subtle fine blue curved line on one accent nail.",
+      "category": "inspiration",
+      "caption": "Something blue"
     }
   ],
   "promotions": [

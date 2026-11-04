@@ -15,6 +15,8 @@ from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = json.loads((ROOT / 'content.json').read_text())
+SALON_PHOTOS = [photo for photo in DATA['gallery'] if photo['category'] != 'inspiration']
+INSPIRATION_PHOTOS = [photo for photo in DATA['gallery'] if photo['category'] == 'inspiration']
 RESULTS = ROOT / 'test-results'
 
 
@@ -51,6 +53,8 @@ class WebsiteTests(unittest.TestCase):
     def setUp(self):
         self.errors = []
         self.context = self.browser.new_context(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce', timezone_id='America/Los_Angeles')
+        # Do not depend on the external map provider while testing local functionality.
+        self.context.route('https://maps.google.com/**', lambda route: route.abort())
         self.context.on('page', lambda page: page.on('pageerror', lambda error: self.errors.append(str(error))))
         self.page = self.context.new_page()
 
@@ -140,7 +144,7 @@ class WebsiteTests(unittest.TestCase):
             expect(page.locator('body')).to_have_attribute('data-page', key)
             expect(page.locator('#main-navigation a[aria-current="page"]')).to_have_attribute('href', re.compile(re.escape(file) + r'(?:\?.*)?$'))
             expect(page.locator('h1')).to_have_count(1)
-            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-static'])
+            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-gallery'])
             titles.add(page.title())
             self.assertTrue(all(not href.startswith('#') for href in page.locator('#main-navigation a').evaluate_all('(nodes) => nodes.map(node => node.getAttribute("href"))')))
         self.assertEqual(len(titles), 7)
@@ -206,8 +210,10 @@ class WebsiteTests(unittest.TestCase):
             response = page.goto(f'{self.url}/Creative-web-USA/gallery.html')
             for photo in DATA['gallery']:
                 self.assertIn(f'src="{photo["src"]}"', response.text())
+            expect(page.locator('#inspiration-grid a.gallery-item')).to_have_count(len(INSPIRATION_PHOTOS))
+            expect(page.locator('.inspiration-disclosure')).to_contain_text('AI-created')
             expect(page.locator('#gallery-grid > a.gallery-item')).to_have_count(8)
-            expect(page.locator('#gallery-static-more .gallery-item')).to_have_count(len(DATA['gallery']) - 8)
+            expect(page.locator('#gallery-static-more .gallery-item')).to_have_count(len(SALON_PHOTOS) - 8)
             expect(page.locator('#gallery-filters')).not_to_be_visible()
             expect(page.locator('#gallery-more')).not_to_be_visible()
             page.locator('#gallery-static-more > summary').click()
@@ -235,7 +241,7 @@ class WebsiteTests(unittest.TestCase):
     def test_published_html_survives_a_failed_content_request(self):
         page = self.page
         page.route('**/content.json', lambda route: route.abort())
-        for file, selector, count in [('services.html', '.service-card', 6), ('gallery.html', 'a.gallery-item', 14), ('offers.html', '#promotions .promotion-card', 1), ('about.html', '#gallery-grid a.gallery-item', 2)]:
+        for file, selector, count in [('services.html', '.service-card', 6), ('gallery.html', 'a.gallery-item', len(DATA['gallery'])), ('offers.html', '#promotions .promotion-card', 1), ('about.html', '#gallery-grid a.gallery-item', 2)]:
             page.goto(f'{self.url}/Creative-web-USA/{file}')
             expect(page.locator('#site-notice')).to_be_visible()
             expect(page.locator(selector)).to_have_count(count)
@@ -264,12 +270,12 @@ class WebsiteTests(unittest.TestCase):
 
     def test_gallery_filter_more_and_accessible_lightbox(self):
         page = self.open_public(suffix='gallery.html')
-        expect(page.locator('.gallery-item')).to_have_count(8)
+        expect(page.locator('#gallery-grid .gallery-item')).to_have_count(8)
         page.locator('#gallery-more').click()
-        expect(page.locator('.gallery-item')).to_have_count(len(DATA['gallery']))
+        expect(page.locator('#gallery-grid .gallery-item')).to_have_count(len(SALON_PHOTOS))
         page.locator('#gallery-filters [data-filter="pedicure"]').click()
-        expect(page.locator('.gallery-item')).to_have_count(3)
-        trigger = page.locator('.gallery-item').first
+        expect(page.locator('#gallery-grid .gallery-item')).to_have_count(3)
+        trigger = page.locator('#gallery-grid .gallery-item').first
         trigger.click()
         expect(page.locator('#gallery-dialog')).to_be_visible()
         expect(page.locator('#lightbox-count')).to_have_text('1 / 3')
@@ -295,6 +301,90 @@ class WebsiteTests(unittest.TestCase):
             page.locator('#service-plan').click()
             self.assert_page_url(page, f"{self.url}/Creative-web-USA/booking.html?service={service['id']}")
             expect(page.locator('#visit-service')).to_have_value(service['id'])
+
+    def test_inspiration_grid_uses_square_photos_and_its_own_lightbox_collection(self):
+        page = self.open_public(suffix='gallery.html')
+        expect(page.locator('#inspiration-grid .gallery-item')).to_have_count(len(INSPIRATION_PHOTOS))
+        expect(page.locator('.inspiration-disclosure')).to_contain_text('AI-created')
+        self.eager_images(page)
+        for width in [1440, 768, 390, 320]:
+            page.set_viewport_size({'width': width, 'height': 1000})
+            boxes = page.locator('#inspiration-grid .gallery-item').evaluate_all('(nodes) => nodes.map(node => { const b = node.getBoundingClientRect(); return {x:b.x, y:b.y, width:b.width, height:b.height}; })')
+            for box in boxes:
+                self.assertAlmostEqual(box['width'], box['height'], delta=1)
+            columns = 2 if width <= 700 else 3
+            self.assertEqual(len(set(round(box['y']) for box in boxes[:columns])), 1)
+            self.assertGreater(boxes[columns]['y'], boxes[0]['y'])
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+        page.set_viewport_size({'width': 1440, 'height': 1000})
+        trigger = page.locator('#inspiration-grid .gallery-item').first
+        trigger.click()
+        expect(page.locator('#lightbox-count')).to_have_text(f'1 / {len(INSPIRATION_PHOTOS)}')
+        expect(page.locator('#lightbox-caption')).to_contain_text('AI-created style inspiration')
+        page.keyboard.press('ArrowRight')
+        expect(page.locator('#lightbox-image')).to_have_attribute('src', INSPIRATION_PHOTOS[1]['src'])
+        page.keyboard.press('Escape')
+        expect(trigger).to_be_focused()
+        page.locator('#gallery-grid .gallery-item').first.click()
+        expect(page.locator('#lightbox-count')).to_have_text(f'1 / {len(SALON_PHOTOS)}')
+        expect(page.locator('#lightbox-image')).to_have_attribute('src', SALON_PHOTOS[0]['src'])
+        expect(page.locator('#lightbox-caption')).not_to_contain_text('AI-created')
+        page.keyboard.press('Escape')
+        page.locator('#style-inspiration').screenshot(path=str(RESULTS / 'nail-inspiration-desktop.png'))
+        page.set_viewport_size({'width': 390, 'height': 844})
+        page.locator('#style-inspiration').screenshot(path=str(RESULTS / 'nail-inspiration-mobile.png'))
+
+    def test_contact_icons_and_map_open_the_correct_destinations(self):
+        page = self.open_public(suffix='booking.html')
+        phone = page.locator('.quick-contact-phone')
+        facebook = page.locator('.quick-contact-facebook')
+        expect(phone).to_have_attribute('href', 'tel:' + DATA['contact']['phone'])
+        expect(phone.locator('use')).to_have_attribute('href', '#i-phone')
+        expect(facebook).to_have_attribute('href', DATA['contact']['facebookUrl'])
+        expect(facebook.locator('use')).to_have_attribute('href', '#i-facebook')
+        expect(facebook).to_have_attribute('target', '_blank')
+        expect(page.locator('.footer-contact use[href="#i-phone"]')).to_have_count(1)
+        expect(page.locator('.footer-contact use[href="#i-facebook"]')).to_have_count(1)
+        frame = page.locator('[data-map-embed]')
+        expect(frame).to_have_count(1)
+        source = urlsplit(frame.get_attribute('src'))
+        self.assertEqual(source.hostname, 'maps.google.com')
+        query = parse_qs(source.query)
+        address = '8 W. Water St., Lewistown, PA 17044'
+        self.assertEqual(query['q'], [address])
+        self.assertEqual(query['output'], ['embed'])
+        self.assertEqual(query['z'], ['16'])
+        overlay = page.locator('.salon-map-overlay')
+        self.assertEqual(parse_qs(urlsplit(overlay.get_attribute('href')).query)['query'], [address])
+        # Stub only the external destination to verify the click opens the correct URL.
+        self.context.route('https://www.google.com/maps/search/**', lambda route: route.fulfill(status=200, content_type='text/html', body='<title>Directions destination</title>'))
+        with page.expect_popup() as popup:
+            overlay.click()
+        popup.value.wait_for_load_state()
+        self.assertEqual(parse_qs(urlsplit(popup.value.url).query)['query'], [address])
+        popup.value.close()
+        for width in [1440, 768, 390, 320]:
+            page.set_viewport_size({'width': width, 'height': 844})
+            expect(phone).to_be_in_viewport()
+            expect(facebook).to_be_in_viewport()
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+            if width <= 700:
+                for icon in [phone, facebook]:
+                    self.assertLess(icon.bounding_box()['y'] + icon.bounding_box()['height'], page.locator('.mobile-book-bar').bounding_box()['y'])
+
+    def test_map_and_quick_contacts_follow_local_business_edits(self):
+        self.open_admin('#content')
+        page = self.page
+        page.locator('#content-contact-address').fill('10 W. Water St.')
+        page.locator('#content-contact-phone').fill('+17175550123')
+        page.locator('#content-contact-facebookUrl').fill('https://www.facebook.com/TestSalonPage')
+        page.get_by_role('button', name='Lưu nội dung', exact=True).click()
+        preview = self.context.new_page()
+        self.open_public(preview, 'booking.html?preview=draft')
+        expect(preview.locator('.quick-contact-phone')).to_have_attribute('href', 'tel:+17175550123')
+        expect(preview.locator('.quick-contact-facebook')).to_have_attribute('href', 'https://www.facebook.com/TestSalonPage')
+        self.assertEqual(parse_qs(urlsplit(preview.locator('[data-map-embed]').get_attribute('src')).query)['q'], ['10 W. Water St., Lewistown, PA 17044'])
+        self.assertEqual(parse_qs(urlsplit(preview.locator('.salon-map-overlay').get_attribute('href')).query)['query'], ['10 W. Water St., Lewistown, PA 17044'])
 
     def test_service_detail_mobile_and_missing_service(self):
         page = self.open_public(suffix='service.html?service=nail-art')

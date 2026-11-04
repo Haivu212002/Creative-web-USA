@@ -1,5 +1,5 @@
-import { pageHref } from './routes.js?v=20261104-static';
-import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js?v=20261104-static';
+import { pageHref } from './routes.js?v=20261104-gallery';
+import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js?v=20261104-gallery';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
@@ -141,7 +141,7 @@ function actionButtons(type, item) {
 function renderLists() {
   const stats = $('#studio-stats');
   stats.replaceChildren();
-  for (const [symbol, value, label] of [['✧', content.services.length, 'dịch vụ'], ['▧', content.gallery.length, 'ảnh salon'], ['♧', activePromotions(content.promotions).length, 'ưu đãi đang hiển thị']]) {
+  for (const [symbol, value, label] of [['✧', content.services.length, 'dịch vụ'], ['▧', content.gallery.length, 'ảnh & cảm hứng'], ['♧', activePromotions(content.promotions).length, 'ưu đãi đang hiển thị']]) {
     const card = el('div', 'stat-card');
     const info = el('div');
     info.append(el('span', 'stat-value', value), el('span', 'stat-label', label));
