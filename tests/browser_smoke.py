@@ -3,6 +3,8 @@ import datetime as dt
 import functools
 import http.server
 import json
+import re
+from urllib.parse import urlsplit, parse_qs, urlunsplit
 from pathlib import Path
 import shutil
 import threading
@@ -62,6 +64,17 @@ class WebsiteTests(unittest.TestCase):
         page.wait_for_function("document.querySelector('#salon-structured-data') || document.querySelector('#service-structured-data') || document.querySelector('#service-not-found:not([hidden])')")
         return page
 
+    def assert_page_url(self, page, expected):
+        wanted = urlsplit(expected)
+        base = urlunsplit((wanted.scheme, wanted.netloc, wanted.path, '', ''))
+        pattern = '^' + re.escape(base) + r'(?:\?[^#]*)?' + (re.escape('#'+wanted.fragment) if wanted.fragment else '') + '$'
+        expect(page).to_have_url(re.compile(pattern))
+        actual = parse_qs(urlsplit(page.url).query)
+        actual.pop('v', None)
+        expected_query = parse_qs(wanted.query)
+        expected_query.pop('v', None)
+        self.assertEqual(actual, expected_query)
+
     def eager_images(self, page):
         page.evaluate("document.querySelectorAll('img[src]').forEach(image => image.loading = 'eager')")
         page.wait_for_function("Array.from(document.images).filter(image => image.hasAttribute('src')).every(image => image.complete && image.naturalWidth > 0)")
@@ -94,7 +107,7 @@ class WebsiteTests(unittest.TestCase):
     def test_home_information_and_mobile_navigation(self):
         page = self.open_public(suffix='index.html')
         expect(page.locator('#main-navigation a')).to_have_count(7)
-        expect(page.locator('.service-card')).to_have_count(3)
+        expect(page.locator('.service-card, #service-grid, #gallery-grid')).to_have_count(0)
         expect(page.locator('#contact, #services, #specials, #gifts')).to_have_count(0)
         self.assertIn('A little polish.', page.locator('h1').inner_text())
         self.assertIn('17044', page.locator('[data-full-address]').inner_text())
@@ -109,7 +122,7 @@ class WebsiteTests(unittest.TestCase):
         page.locator('.menu-toggle').click()
         expect(page.locator('.menu-toggle')).to_have_attribute('aria-expanded', 'true')
         with page.expect_navigation(wait_until='domcontentloaded') as navigation:
-            page.locator('#main-navigation a[href="gallery.html"]').click()
+            page.locator('#main-navigation a[href^="gallery.html"]').click()
         self.assertEqual(navigation.value.status, 200)
         expect(page.locator('body')).to_have_attribute('data-page', 'gallery')
         expect(page.locator('.menu-toggle')).to_have_attribute('aria-expanded', 'false')
@@ -120,13 +133,14 @@ class WebsiteTests(unittest.TestCase):
         titles = set()
         for key, file in routes.items():
             with page.expect_navigation(wait_until='domcontentloaded') as navigation:
-                page.locator(f'#main-navigation a[href="{file}"]').click()
+                page.locator(f'#main-navigation a[href^="{file}"]').click()
             self.assertIsNotNone(navigation.value, 'A menu click must request a document, not just change a hash.')
             self.assertEqual(navigation.value.status, 200)
-            expect(page).to_have_url(f'{self.url}/Creative-web-USA/{file}')
+            self.assert_page_url(page, f'{self.url}/Creative-web-USA/{file}')
             expect(page.locator('body')).to_have_attribute('data-page', key)
-            expect(page.locator('#main-navigation a[aria-current="page"]')).to_have_attribute('href', file)
+            expect(page.locator('#main-navigation a[aria-current="page"]')).to_have_attribute('href', re.compile(re.escape(file) + r'(?:\?.*)?$'))
             expect(page.locator('h1')).to_have_count(1)
+            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-mp2'])
             titles.add(page.title())
             self.assertTrue(all(not href.startswith('#') for href in page.locator('#main-navigation a').evaluate_all('(nodes) => nodes.map(node => node.getAttribute("href"))')))
         self.assertEqual(len(titles), 7)
@@ -154,7 +168,7 @@ class WebsiteTests(unittest.TestCase):
             page.goto(f'{self.url}/Creative-web-USA/index.html')
             for key, file in json.loads((ROOT / 'docs/page-routes.json').read_text()).items():
                 with page.expect_navigation(wait_until='domcontentloaded') as navigation:
-                    page.locator(f'#main-navigation a[href="{file}"]').click()
+                    page.locator(f'#main-navigation a[href^="{file}"]').click()
                 self.assertEqual(navigation.value.status, 200)
                 expect(page.locator('body')).to_have_attribute('data-page', key)
                 expect(page.locator('h1')).to_be_visible()
@@ -169,7 +183,7 @@ class WebsiteTests(unittest.TestCase):
         page.locator('#service-filters [data-filter="spa"]').click()
         expect(page.locator('.service-card')).to_have_count(2)
         page.get_by_role('link', name='Plan a visit for Waxing', exact=True).click()
-        expect(page).to_have_url(f'{self.url}/booking.html?service=waxing')
+        self.assert_page_url(page, f'{self.url}/booking.html?service=waxing')
         expect(page.locator('#visit-service')).to_have_value('waxing')
 
     def test_gallery_filter_more_and_accessible_lightbox(self):
@@ -194,7 +208,7 @@ class WebsiteTests(unittest.TestCase):
         for service in DATA['services']:
             self.open_public(suffix='Creative-web-USA/services.html')
             page.get_by_role('link', name=f"View details for {service['name']}", exact=True).click()
-            expect(page).to_have_url(f"{self.url}/Creative-web-USA/service.html?service={service['id']}")
+            self.assert_page_url(page, f"{self.url}/Creative-web-USA/service.html?service={service['id']}")
             expect(page.locator('#service-name')).to_have_text(service['name'])
             expect(page.locator('#service-description')).to_have_text(service['details'])
             expect(page.locator('#service-highlights li')).to_have_count(len(service['highlights'].splitlines()))
@@ -203,7 +217,7 @@ class WebsiteTests(unittest.TestCase):
             expect(page.locator('#service-image')).to_have_attribute('src', service['image'])
             expect(page.locator('.detail-phone')).to_have_attribute('href', 'tel:+17172484131')
             page.locator('#service-plan').click()
-            expect(page).to_have_url(f"{self.url}/Creative-web-USA/booking.html?service={service['id']}")
+            self.assert_page_url(page, f"{self.url}/Creative-web-USA/booking.html?service={service['id']}")
             expect(page.locator('#visit-service')).to_have_value(service['id'])
 
     def test_service_detail_mobile_and_missing_service(self):
@@ -215,7 +229,7 @@ class WebsiteTests(unittest.TestCase):
         self.eager_images(page)
         page.screenshot(path=str(RESULTS / 'service-mobile.png'), full_page=True)
         page.locator('.menu-toggle').click()
-        page.locator('#main-navigation a[href="services.html"]').click()
+        page.locator('#main-navigation a[href^="services.html"]').click()
         expect(page.locator('#service-grid')).to_be_visible()
         page.goto(f'{self.url}/service.html?service=missing-service')
         expect(page.locator('#service-not-found')).to_be_visible()
@@ -238,7 +252,7 @@ class WebsiteTests(unittest.TestCase):
         preview = self.context.new_page()
         preview.goto(f'{self.url}/services.html?preview=draft')
         preview.get_by_role('link', name='View details for Manicure', exact=True).click()
-        expect(preview).to_have_url(f'{self.url}/service.html?service=manicure&preview=draft')
+        self.assert_page_url(preview, f'{self.url}/service.html?service=manicure&preview=draft')
         expect(preview.locator('#preview-banner')).to_be_visible()
         expect(preview.locator('#service-description')).to_have_text(literal)
         expect(preview.locator('#service-highlights li')).to_have_count(2)
@@ -255,11 +269,11 @@ class WebsiteTests(unittest.TestCase):
         routes = json.loads((ROOT / 'docs/legacy-routes.json').read_text())
         for name, destination in routes.items():
             self.page.goto(f'{self.url}/Creative-web-USA/{name}')
-            expect(self.page).to_have_url(f'{self.url}/Creative-web-USA/{destination}')
+            self.assert_page_url(self.page, f'{self.url}/Creative-web-USA/{destination}')
             expect(self.page.locator('#salon-structured-data')).to_have_count(1)
         for fragment, file in [('services', 'services.html'), ('gallery', 'gallery.html'), ('contact', 'booking.html'), ('gifts', 'gift-certificates.html')]:
             self.page.goto(f'{self.url}/Creative-web-USA/#{fragment}')
-            expect(self.page).to_have_url(f'{self.url}/Creative-web-USA/{file}')
+            self.assert_page_url(self.page, f'{self.url}/Creative-web-USA/{file}')
         self.page.goto(f'{self.url}/Creative-web-USA/booking.html?service=design')
         expect(self.page.locator('#visit-service')).to_have_value('nail-art')
 
@@ -283,9 +297,9 @@ class WebsiteTests(unittest.TestCase):
             self.assertEqual(page.locator('.page-intro-copy h1').evaluate('(node) => getComputedStyle(node).animationName'), 'enter-up')
             card = page.locator('.service-card').last
             card.scroll_into_view_if_needed()
-            expect(card).to_have_class(__import__('re').compile('is-revealed'))
+            expect(card).to_have_class(re.compile('is-revealed'))
             page.wait_for_function("Number(document.documentElement.style.getPropertyValue('--reading-progress')) > 0")
-            expect(page.locator('.site-header')).to_have_class(__import__('re').compile('is-scrolled'))
+            expect(page.locator('.site-header')).to_have_class(re.compile('is-scrolled'))
             expect(page.locator('.back-to-top')).to_be_visible()
             page.locator('.back-to-top').click()
             page.wait_for_function('scrollY < 10')

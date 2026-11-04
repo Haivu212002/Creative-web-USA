@@ -1,3 +1,5 @@
+export const SITE_RELEASE = '20261104-mp2';
+
 export const PAGE_ROUTES = Object.freeze({
   home: 'index.html',
   services: 'services.html',
@@ -32,6 +34,7 @@ export function pageHref(page, parameters = {}) {
   for (const [key, value] of Object.entries(parameters)) {
     if (value !== undefined && value !== null && value !== false && value !== '') query.set(key, String(value));
   }
+  query.set('v', SITE_RELEASE);
   return PAGE_ROUTES[page] + (query.size ? `?${query}` : '');
 }
 

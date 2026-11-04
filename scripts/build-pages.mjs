@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
-import { NAV_PAGES, PAGE_LABELS, PAGE_ROUTES } from '../assets/js/routes.js';
+import { NAV_PAGES, PAGE_LABELS, PAGE_ROUTES, SITE_RELEASE, pageHref } from '../assets/js/routes.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const checkOnly = process.argv.includes('--check');
@@ -36,20 +36,27 @@ for (const [page, file] of Object.entries(PAGE_ROUTES)) {
   const current = page === 'service' ? 'services' : page.startsWith('journal') ? 'about' : page;
   const navigation = NAV_PAGES.map(key => {
     const classes = [key === current ? 'active' : '', key === 'contact' ? 'nav-book' : ''].filter(Boolean).join(' ');
-    return `<a href="${PAGE_ROUTES[key]}"${classes ? ` class="${classes}"` : ''}${key === current ? ' aria-current="page"' : ''}>${escape(PAGE_LABELS[key])}${key === 'contact' ? ' <span class="external-arrow" aria-hidden="true"></span>' : ''}</a>`;
+    return `<a href="${escape(pageHref(key))}"${classes ? ` class="${classes}"` : ''}${key === current ? ' aria-current="page"' : ''}>${escape(PAGE_LABELS[key])}${key === 'contact' ? ' <span class="external-arrow" aria-hidden="true"></span>' : ''}</a>`;
   }).join('\n        ');
   const title = page === 'home' ? 'Fashion Nails & Spa | Nail Salon in Lewistown, PA' : `${PAGE_LABELS[page]} | Fashion Nails & Spa · Lewistown, PA`;
   const description = descriptions[page] || `${PAGE_LABELS[page]} at Fashion Nails & Spa, 8 W. Water St., Lewistown, PA 17044. Call (717) 248-4131.`;
   const tokens = {
     PAGE: page, TITLE: escape(title), DESCRIPTION: escape(description), NAVIGATION: navigation,
     ICONS: icons.trim(), CONTENT: content.trim(), FOOTER: footer.trim(), LIGHTBOX: lightbox.trim(),
-    EXTRA_HEAD: page === 'service' ? '<link rel="stylesheet" href="assets/css/service.css?v=20261104-multipage">' : '',
+    EXTRA_HEAD: page === 'service' ? `<link rel="stylesheet" href="assets/css/service.css?v=${SITE_RELEASE}">` : '',
+    RELEASE: SITE_RELEASE,
     SCRIPT: page === 'service' ? 'service.js' : 'site.js',
   };
-  const html = layout.replace(/\{\{([A-Z_]+)\}\}/g, (_, key) => {
+  let html = layout.replace(/\{\{([A-Z_]+)\}\}/g, (_, key) => {
     if (!Object.hasOwn(tokens, key)) throw new Error(`Unknown layout token: ${key}`);
     return tokens[key];
   }).replace(/[\t ]+$/gm, '');
+  html = html.replace(/(<a\b[^>]*\bhref=")([^"]+)(")/g, (match, before, href, after) => {
+    const url = new URL(href.replaceAll('&amp;', '&'), 'https://build.invalid/');
+    if (url.origin !== 'https://build.invalid' || !Object.values(PAGE_ROUTES).some(file => url.pathname === '/' + file)) return match;
+    url.searchParams.set('v', SITE_RELEASE);
+    return before + escape(url.pathname.slice(1) + url.search + url.hash) + after;
+  });
   await emit(file, html);
 }
 

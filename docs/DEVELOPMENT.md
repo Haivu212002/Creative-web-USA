@@ -95,7 +95,7 @@ Trong môi trường cloud, lệnh mạng có thể cần quyền phù hợp dù
 
 ## Điều hướng đa trang và chuyển động
 
-Bảy menu chính trỏ đến bảy file HTML thật, không cuộn giữa các phần của một trang và không dùng router SPA. Nút Back/Forward dùng lịch sử tài liệu của trình duyệt; các liên kết menu hoạt động ngay cả khi tắt JavaScript. Trang chủ chỉ có giới thiệu, ba dịch vụ xem nhanh, bốn ảnh xem nhanh và lời mời ghé salon.
+Bảy menu chính trỏ đến bảy file HTML thật, không cuộn giữa các phần của một trang và không dùng router SPA. Nút Back/Forward dùng lịch sử tài liệu của trình duyệt; các liên kết menu hoạt động ngay cả khi tắt JavaScript. Trang chủ chỉ có giới thiệu salon và ba liên kết dẫn sang trang dịch vụ, gallery và booking; không hiển thị danh sách dịch vụ hoặc gallery trên Home. Các liên kết nội bộ có tham số phiên bản để tránh tái sử dụng trang chuyển hướng cũ đã lưu trong trình duyệt.
 
 Hiệu ứng dùng CSS và IntersectionObserver: banner xuất hiện nhẹ, ảnh phóng khi hover, thẻ nổi, phần nội dung xuất hiện khi cuộn, menu điện thoại chuyển động, lightbox mở nhẹ, thanh tiến độ đọc và nút về đầu trang. Trình duyệt hỗ trợ có chuyển cảnh tài liệu bằng View Transitions; trình duyệt khác điều hướng bình thường. Không chặn liên kết để giả lập đổi trang. Hiệu ứng tôn trọng `prefers-reduced-motion`, và nội dung vẫn hiện khi không có JavaScript hoặc IntersectionObserver.
 

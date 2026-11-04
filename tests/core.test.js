@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { LEGACY_HASH_ROUTES, NAV_PAGES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from '../assets/js/routes.js';
+import { LEGACY_HASH_ROUTES, NAV_PAGES, PAGE_ROUTES, SITE_RELEASE, legacyServiceId, pageHref, previewParameters } from '../assets/js/routes.js';
 import { activePromotions, appointmentSlots, DRAFT_KEY, formatPrice, formatTime, isDate, loadDraft, safeFacebook, safeImage, salonDate, saveDraft, validateContent } from '../assets/js/core.js';
 
 const published = JSON.parse(readFileSync(new URL('../content.json', import.meta.url), 'utf8'));
@@ -124,16 +124,16 @@ test('displayed salon photos use verified enhanced files and original photograph
 
 test('the seven main menus resolve to distinct physical HTML pages', () => {
   assert.equal(NAV_PAGES.length, 7);
-  const files = NAV_PAGES.map(page => pageHref(page));
+  const files = NAV_PAGES.map(page => pageHref(page).split('?')[0]);
   assert.equal(new Set(files).size, 7);
   assert.ok(files.every(file => file.endsWith('.html') && !file.includes('#')));
   for (const file of files) assert.ok(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8').includes('<main id="main"'));
 });
 
 test('page links preserve preview and chosen service with safe query encoding', () => {
-  assert.equal(pageHref('contact', { service: 'nail-art', ...previewParameters('?preview=draft') }), 'booking.html?service=nail-art&preview=draft');
-  assert.equal(pageHref('gallery', previewParameters('?preview=other')), 'gallery.html');
-  assert.equal(pageHref('service', { service: 'a&preview=unexpected' }), 'service.html?service=a%26preview%3Dunexpected');
+  assert.equal(pageHref('contact', { service: 'nail-art', ...previewParameters('?preview=draft') }), `booking.html?service=nail-art&preview=draft&v=${SITE_RELEASE}`);
+  assert.equal(pageHref('gallery', previewParameters('?preview=other')), `gallery.html?v=${SITE_RELEASE}`);
+  assert.equal(pageHref('service', { service: 'a&preview=unexpected' }), `service.html?service=a%26preview%3Dunexpected&v=${SITE_RELEASE}`);
   assert.throws(() => pageHref('javascript:alert(1)'));
 });
 

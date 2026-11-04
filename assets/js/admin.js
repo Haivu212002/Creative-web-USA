@@ -1,5 +1,5 @@
-import { pageHref } from './routes.js';
-import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js';
+import { pageHref } from './routes.js?v=20261104-mp2';
+import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js?v=20261104-mp2';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);

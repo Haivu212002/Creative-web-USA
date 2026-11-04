@@ -1,6 +1,6 @@
-import { LEGACY_HASH_ROUTES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js';
-import { initEffects, observeEffects } from './effects.js';
-import { createElement as el, fullAddress } from './core.js';
+import { LEGACY_HASH_ROUTES, PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-mp2';
+import { initEffects, observeEffects } from './effects.js?v=20261104-mp2';
+import { createElement as el, fullAddress } from './core.js?v=20261104-mp2';
 
 export function applyBusinessContent(content) {
   document.querySelectorAll('[data-bind]').forEach(node => {
