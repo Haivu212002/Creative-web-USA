@@ -1,6 +1,6 @@
 export const DRAFT_KEY = 'fashion-nails.content-draft.v1';
 export const CATEGORIES = { nails: 'Nails', pedicure: 'Pedicures', spa: 'Waxing & Facial' };
-export const GALLERY_CATEGORIES = { nails: 'Nail art', pedicure: 'Pedicures', salon: 'Our salon', community: 'Our community' };
+export const GALLERY_CATEGORIES = { nails: 'Nail art', pedicure: 'Pedicures', salon: 'Our salon', community: 'Our community', inspiration: 'Style inspiration · AI-created' };
 export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export const SALON_TIMEZONE = 'America/New_York';
 

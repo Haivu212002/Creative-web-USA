@@ -1,0 +1,62 @@
+{
+  "source": "OpenAI image generation tool",
+  "createdDate": "2026-11-04",
+  "purpose": "AI-created nail style inspiration; not salon portfolio photographs",
+  "pinterestImagesUsed": false,
+  "images": [
+    {
+      "id": "inspiration-french",
+      "asset": "assets/images/inspiration-french.webp",
+      "title": "Modern French",
+      "description": "A modern French manicure on healthy medium-short almond-shaped nails: translucent milky pink base, exceptionally crisp thin ivory white tips.",
+      "sha256": "3e7ae43889bebe3d62d54bc143b15ac82f9a0652dec2a4e7eb1a2cb67a76cc27",
+      "generatedOriginal": "exec-f04d3be7-82e6-440c-ad18-81cfdb87ffa9.png",
+      "generatedOriginalSha256": "53ba1bac8bca9fe185bf92c77d8ad5faada7988b539e614aa206a43cba687e8d"
+    },
+    {
+      "id": "inspiration-cherry",
+      "asset": "assets/images/inspiration-cherry.webp",
+      "title": "Cherry red",
+      "description": "A classic rich cherry-red glossy manicure on healthy short squoval-shaped nails. Smooth solid opaque red, no nail art, clean refined elegance.",
+      "sha256": "6579c2cdbdef4a24e1f0ebd02fb87ef3c9e32f3ccf9867bd475ce3d5fd394070",
+      "generatedOriginal": "exec-c52da527-2294-4d46-b43a-2a5cc51b6255.png",
+      "generatedOriginalSha256": "fb8db35bd590b34ff32111e62de7a649b6c6877eadcd3b89a4f41aad7e5dd962"
+    },
+    {
+      "id": "inspiration-glazed",
+      "asset": "assets/images/inspiration-glazed.webp",
+      "title": "Soft glaze",
+      "description": "A soft blush pink glazed pearl manicure on healthy medium almond-shaped nails, subtle translucent pearlescent finish, gentle champagne reflections.",
+      "sha256": "74d263cd29d94fcbf5e701706a272dc7a29e4a5fc7f445f1c3b1467ede0b8105",
+      "generatedOriginal": "exec-7dfe0eeb-3e79-4d66-b30e-f6245c9db728.png",
+      "generatedOriginalSha256": "6834b522082c24884b66131bcdd894f02c4de5f9912df208ad64428574f40eff"
+    },
+    {
+      "id": "inspiration-lavender",
+      "asset": "assets/images/inspiration-lavender.webp",
+      "title": "Lilac bloom",
+      "description": "A delicate soft lavender manicure on healthy short rounded nails, just one tiny delicate white daisy accent with a pale yellow center, very minimal floral nail art.",
+      "sha256": "dc84a66d7c3caf985c3ebeec33dd9d3a28ec76048f2704848b44837fae63b86b",
+      "generatedOriginal": "exec-5ddc5143-1e84-40de-a3b2-f317d6fd0ed1.png",
+      "generatedOriginalSha256": "711f8481db0c89734af1122b284b7b7687ddcbc548c54536e074d94805c6838b"
+    },
+    {
+      "id": "inspiration-gold",
+      "asset": "assets/images/inspiration-gold.webp",
+      "title": "Golden detail",
+      "description": "A warm sheer nude manicure on healthy medium oval-shaped nails, very fine delicate curved metallic gold lines on two accent nails, minimalist wearable nail design.",
+      "sha256": "43cc12aa542e9fcd6b8085ac9c319ae25e30940aff0ce90a312dedff4fa6502f",
+      "generatedOriginal": "exec-5ac53f66-752c-4612-bc04-f0ba5bcaea08.png",
+      "generatedOriginalSha256": "d9ab08760c9185ec9703dab52e6e60ee25550158b109b12ab7ac62683b997c85"
+    },
+    {
+      "id": "inspiration-blue",
+      "asset": "assets/images/inspiration-blue.webp",
+      "title": "Something blue",
+      "description": "A muted powder blue and ivory manicure on healthy short rounded nails, alternating solid powder blue and sheer ivory nails with a subtle fine blue curved line on one accent nail.",
+      "sha256": "764047b7f9df605e06c10e504ae8a2d8cf526ece66d1007b564cf8d338ba870b",
+      "generatedOriginal": "exec-8b06fe98-5d4d-416f-b7e7-cdd5e5e9b338.png",
+      "generatedOriginalSha256": "82e62ecb641c2d32a28565c6ef852c4bd987810747e7d514ea005d48e473e44f"
+    }
+  ]
+}
