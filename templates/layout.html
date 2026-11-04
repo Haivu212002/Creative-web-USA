@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#6b263b">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{DESCRIPTION}}">
+  <meta property="og:title" content="{{TITLE}}">
+  <meta property="og:description" content="{{DESCRIPTION}}">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css?v=20261104-multipage">
+  <link rel="stylesheet" href="assets/css/multipage.css?v=20261104-multipage">
+  <link rel="stylesheet" href="assets/css/effects.css?v=20261104-multipage">
+  {{EXTRA_HEAD}}
+  <script type="module" src="assets/js/{{SCRIPT}}?v=20261104-multipage"></script>
+</head>
+<body id="top" class="page page-{{PAGE}}" data-page="{{PAGE}}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  {{ICONS}}
+  <div class="reading-progress" aria-hidden="true"></div>
+  <div id="preview-banner" class="preview-banner" hidden>Local draft preview · Only this browser sees these changes. <a href="admin/">Back to content studio</a></div>
+  <div class="announcement"><div class="container announcement-inner"><span><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> A little beauty in the heart of <span data-city>Lewistown, PA</span></span><a data-phone-link href="tel:+17172484131"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg> <span data-phone-display>(717) 248-4131</span></a></div></div>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="index.html" aria-label="Fashion Nails & Spa home"><span class="brand-mark" aria-hidden="true">f<span>✦</span></span><span class="brand-type">FASHION<span>NAILS & SPA</span></span></a><button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="main-navigation"><span></span><span></span><span></span></button><nav id="main-navigation" class="main-nav" aria-label="Main navigation">
+        {{NAVIGATION}}
+      </nav></div></header>
+  <main id="main" tabindex="-1">
+    <p id="site-notice" class="site-notice container" role="status" hidden></p>
+    {{CONTENT}}
+  </main>
+  {{FOOTER}}
+  <a class="back-to-top" href="#top" aria-label="Back to top" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+  <div class="mobile-book-bar"><a data-phone-link href="tel:+17172484131"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg> Call the salon</a><a id="mobile-service-plan" href="booking.html">Plan your visit <span class="external-arrow" aria-hidden="true"></span></a></div>
+  {{LIGHTBOX}}
+  <noscript><p class="noscript-note">The menu links open individual pages. Please enable JavaScript to use photo filters, local previews and the visit planner, or call <a href="tel:+17172484131">(717) 248-4131</a>.</p></noscript>
+</body>
+</html>

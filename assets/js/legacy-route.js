@@ -1,13 +1,12 @@
-// Preserve bookmarked URLs from the earlier multi-page demo.
-const allowedTargets = new Set(['services', 'gallery', 'about', 'specials', 'contact']);
+import { PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js';
+
+// Older secondary URLs keep working while each main menu now has its own file.
 const target = document.documentElement.dataset.legacyTarget;
-if (allowedTargets.has(target)) {
-  const destination = new URL('./', window.location.href);
-  destination.hash = target;
+if (Object.hasOwn(PAGE_ROUTES, target)) {
+  const parameters = previewParameters(location.search);
   if (target === 'contact') {
-    const services = { manicure: 'manicure', pedicure: 'pedicure', design: 'nail-art' };
-    const service = new URLSearchParams(window.location.search).get('service');
-    if (Object.hasOwn(services, service)) destination.searchParams.set('service', services[service]);
+    const service = legacyServiceId(new URLSearchParams(location.search).get('service'));
+    if (service && /^[a-z0-9-]{1,80}$/.test(service)) parameters.service = service;
   }
-  window.location.replace(destination.href);
+  window.location.replace(new URL(pageHref(target, parameters), location.href).href);
 }

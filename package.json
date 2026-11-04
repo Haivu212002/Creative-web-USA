@@ -1,12 +1,14 @@
 {
   "name": "fashion-nails-spa",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "Fashion Nails & Spa website and local content studio. No build or runtime dependencies.",
   "scripts": {
+    "build": "node scripts/build-pages.mjs",
+    "build:check": "node scripts/build-pages.mjs --check",
     "start": "python3 -m http.server 4173 --bind 0.0.0.0",
-    "check": "node --check assets/js/core.js && node --check assets/js/site.js && node --check assets/js/admin.js && node --check assets/js/legacy-route.js && node --check assets/js/service.js",
+    "check": "npm run build:check && node --check assets/js/core.js && node --check assets/js/site.js && node --check assets/js/admin.js && node --check assets/js/legacy-route.js && node --check assets/js/service.js && node --check assets/js/chrome.js && node --check assets/js/routes.js && node --check assets/js/effects.js",
     "test": "node tests/core.test.js",
     "test:browser": "python3 tests/browser_smoke.py"
   },

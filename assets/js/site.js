@@ -1,4 +1,7 @@
-import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, fullAddress, loadDraft, loadPublishedContent, salonDate } from './core.js';
+import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js';
+import { observeEffects } from './effects.js';
+import { PAGE_LABELS, legacyServiceId, pageHref, previewParameters } from './routes.js';
+import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js';
 
 let content;
 let serviceFilter = 'all';
@@ -8,7 +11,6 @@ let lightboxPhotos = [];
 let lightboxIndex = 0;
 let lightboxTrigger;
 const $ = selector => document.querySelector(selector);
-const $$ = selector => document.querySelectorAll(selector);
 
 function arrow() {
   const span = el('span', 'external-arrow');
@@ -24,113 +26,83 @@ function callLink(text, className = 'text-link') {
 }
 
 function applyContent() {
-  $$('[data-bind]').forEach(node => {
-    const [section, key] = node.dataset.bind.split('.');
-    const value = content[section]?.[key];
-    if (typeof value === 'string') node.textContent = value;
-  });
+  applyBusinessContent(content);
   const c = content.contact;
-  $$('[data-phone-link]').forEach(a => { a.href = `tel:${c.phone}`; });
-  $$('[data-phone-display]').forEach(node => { node.textContent = c.phoneDisplay; });
-  $$('[data-city]').forEach(node => { node.textContent = `${c.city}, ${c.state}`; });
-  $$('[data-full-address]').forEach(node => { node.textContent = fullAddress(c); });
-  $$('[data-address]').forEach(node => { node.replaceChildren(document.createTextNode(c.address), el('br'), document.createTextNode(`${c.city}, ${c.state} ${c.zip}`)); });
-  $$('[data-map-link]').forEach(a => { a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress(c))}`; });
-  $$('[data-facebook-link]').forEach(a => { a.href = c.facebookUrl; });
-  $$('[data-facebook-name]').forEach(node => { node.textContent = c.facebookName; });
-  $('#copyright-year').textContent = new Date().getFullYear();
-  document.title = `${content.brand.name} | Nail Salon in ${c.city}, ${c.state}`;
-  $('#service-grid').replaceChildren();
-  renderServices();
-  renderGallery();
-  renderPromotions();
-  renderHours();
-  const options = content.services.map(service => {
-    const option = el('option', '', service.name);
-    option.value = service.id;
-    return option;
-  });
-  $('#visit-service').replaceChildren(new Option('Choose a service', ''), ...options);
-  const requestedService = new URLSearchParams(location.search).get('service');
-  if (content.services.some(service => service.id === requestedService)) $('#visit-service').value = requestedService;
-  $('#visit-date').min = salonDate();
+  if ($('#copyright-year')) $('#copyright-year').textContent = new Date().getFullYear();
+  const page = document.body.dataset.page || 'home';
+  document.title = page === 'home' ? `${content.brand.name} | Nail Salon in ${c.city}, ${c.state}` : `${PAGE_LABELS[page] || 'Fashion Nails & Spa'} | ${content.brand.name} · ${c.city}, ${c.state}`;
+  if ($('#service-grid')) renderServices();
+  if ($('#gallery-grid')) renderGallery();
+  if ($('#promotions')) renderPromotions();
+  if ($('#hours-list')) renderHours();
+  if ($('#visit-service')) {
+    const options = content.services.map(service => new Option(service.name, service.id));
+    $('#visit-service').replaceChildren(new Option('Choose a service', ''), ...options);
+    const requestedService = legacyServiceId(new URLSearchParams(location.search).get('service'));
+    if (content.services.some(service => service.id === requestedService)) $('#visit-service').value = requestedService;
+    $('#visit-date').min = salonDate();
+  }
   addStructuredData();
+  observeEffects();
 }
 
 function renderServices() {
   const grid = $('#service-grid');
-  const services = content.services.filter(item => serviceFilter === 'all' || item.category === serviceFilter);
+  let services = content.services.filter(item => serviceFilter === 'all' || item.category === serviceFilter);
+  if (grid.dataset.featured) {
+    const ids = grid.dataset.featured.split(',');
+    services = ids.map(id => services.find(item => item.id === id)).filter(Boolean);
+  }
+  if (grid.dataset.limit) services = services.slice(0, Number(grid.dataset.limit));
   grid.replaceChildren();
   if (!services.length) { grid.append(el('p', 'empty-state', 'Please call us to ask about services in this category.')); return; }
   for (const service of services) {
     const card = el('article', 'service-card');
-    const detailsUrl = new URL('service.html', location.href);
-    detailsUrl.hash = '';
-    detailsUrl.search = '';
-    detailsUrl.searchParams.set('service', service.id);
-    if (new URLSearchParams(location.search).get('preview') === 'draft') detailsUrl.searchParams.set('preview', 'draft');
+    const detailsUrl = pageHref('service', { service: service.id, ...previewParameters(location.search) });
     const photo = el('a', 'service-photo');
-    photo.href = detailsUrl.href;
+    photo.href = detailsUrl;
     photo.setAttribute('aria-label', `View details for ${service.name}`);
     const image = el('img');
     image.src = service.image;
     image.alt = service.category === 'spa' ? 'A look inside Fashion Nails & Spa' : `${service.name} inspiration from Fashion Nails & Spa`;
-    image.loading = 'lazy';
-    image.width = 600;
-    image.height = 450;
+    image.loading = 'lazy'; image.width = 600; image.height = 450;
     photo.append(image, el('span', 'service-category', CATEGORIES[service.category]));
     const body = el('div', 'service-content');
     const footer = el('div', 'service-card-footer');
     const price = el('span', 'service-price', formatPrice(service.price));
     if (service.duration !== null) price.append(el('small', '', `Approx. ${service.duration} min`));
-    const select = el('button', 'service-select');
-    select.append(arrow());
-    select.type = 'button';
-    select.setAttribute('aria-label', `Plan a visit for ${service.name}`);
-    select.addEventListener('click', () => {
-      $('#visit-service').value = service.id;
-      $('#visit-summary').hidden = true;
-      window.location.hash = 'contact';
-      $('#visit-date').focus({ preventScroll: true });
-    });
-    footer.append(price, select);
+    const plan = el('a', 'service-select');
+    plan.append(arrow());
+    plan.href = pageHref('contact', { service: service.id, ...previewParameters(location.search) });
+    plan.setAttribute('aria-label', `Plan a visit for ${service.name}`);
+    footer.append(price, plan);
     const heading = el('h3');
-    const headingLink = el('a', '', service.name);
-    headingLink.href = detailsUrl.href;
-    heading.append(headingLink);
+    const headingLink = el('a', '', service.name); headingLink.href = detailsUrl; heading.append(headingLink);
     const readMore = el('a', 'service-read-more', 'Explore this service');
-    readMore.href = detailsUrl.href;
-    readMore.setAttribute('aria-label', `Read about ${service.name}`);
-    readMore.append(arrow());
+    readMore.href = detailsUrl; readMore.setAttribute('aria-label', `Read about ${service.name}`); readMore.append(arrow());
     body.append(heading, el('p', '', service.description), readMore, footer);
-    card.append(photo, body);
-    grid.append(card);
+    card.append(photo, body); grid.append(card);
   }
+  observeEffects(grid);
 }
 
 function renderGallery() {
   const grid = $('#gallery-grid');
-  lightboxPhotos = content.gallery.filter(photo => galleryFilter === 'all' || photo.category === galleryFilter);
-  const displayed = showAllPhotos ? lightboxPhotos : lightboxPhotos.slice(0, 8);
+  const category = galleryFilter === 'all' ? grid.dataset.category || 'all' : galleryFilter;
+  const limit = Number(grid.dataset.limit || 8);
+  lightboxPhotos = content.gallery.filter(photo => category === 'all' || photo.category === category);
+  const displayed = showAllPhotos ? lightboxPhotos : lightboxPhotos.slice(0, limit);
   grid.replaceChildren();
   if (!displayed.length) grid.append(el('p', 'empty-state', 'More salon moments are on their way. Please check back soon.'));
   displayed.forEach((photo, index) => {
-    const button = el('button', 'gallery-item');
-    button.type = 'button';
+    const button = el('button', 'gallery-item'); button.type = 'button';
     button.setAttribute('aria-label', `View photo: ${photo.caption || photo.alt}`);
-    const image = el('img');
-    image.src = photo.src;
-    image.alt = photo.alt;
-    image.loading = 'lazy';
-    image.width = 600;
-    image.height = 750;
-    const caption = el('span', 'gallery-caption');
-    caption.append(el('span', '', photo.caption), arrow());
-    button.append(image, caption);
-    button.addEventListener('click', () => openLightbox(index, button));
-    grid.append(button);
+    const image = el('img'); image.src = photo.src; image.alt = photo.alt; image.loading = 'lazy'; image.width = 600; image.height = 750;
+    const caption = el('span', 'gallery-caption'); caption.append(el('span', '', photo.caption), arrow());
+    button.append(image, caption); button.addEventListener('click', () => openLightbox(index, button)); grid.append(button);
   });
-  $('#gallery-more').hidden = showAllPhotos || lightboxPhotos.length <= 8;
+  if ($('#gallery-more')) $('#gallery-more').hidden = showAllPhotos || lightboxPhotos.length <= limit;
+  observeEffects(grid);
 }
 
 function updateLightbox() {
@@ -226,38 +198,28 @@ function addStructuredData() {
 }
 
 function setupInteractions() {
-  const toggle = $('.menu-toggle');
-  const nav = $('#main-navigation');
-  function closeMenu() { nav.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-label', 'Open menu'); }
-  toggle.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') !== 'true';
-    nav.classList.toggle('is-open', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-  });
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', event => { if (event.key === 'Escape' && nav.classList.contains('is-open')) { closeMenu(); toggle.focus(); } });
-  document.addEventListener('click', event => { if (!event.target.closest('.site-header')) closeMenu(); });
   for (const [id, callback] of [['service-filters', value => { serviceFilter = value; renderServices(); }], ['gallery-filters', value => { galleryFilter = value; showAllPhotos = false; renderGallery(); }]]) {
-    $(`#${id}`).addEventListener('click', event => {
+    const group = $(`#${id}`);
+    group?.addEventListener('click', event => {
       const button = event.target.closest('[data-filter]');
       if (!button) return;
-      $(`#${id}`).querySelectorAll('button').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', String(item === button)); });
+      group.querySelectorAll('button').forEach(item => { item.classList.toggle('active', item === button); item.setAttribute('aria-pressed', String(item === button)); });
       callback(button.dataset.filter);
     });
   }
-  $('#gallery-more').addEventListener('click', () => { showAllPhotos = true; renderGallery(); $('#gallery-grid').children[8]?.focus({ preventScroll: true }); });
-  $('[data-close-gallery]').addEventListener('click', () => $('#gallery-dialog').close());
-  $('#lightbox-prev').addEventListener('click', () => movePhoto(-1));
-  $('#lightbox-next').addEventListener('click', () => movePhoto(1));
-  $('#gallery-dialog').addEventListener('keydown', event => {
+  $('#gallery-more')?.addEventListener('click', () => { showAllPhotos = true; renderGallery(); $('#gallery-grid').children[8]?.focus({ preventScroll: true }); });
+  $('[data-close-gallery]')?.addEventListener('click', () => $('#gallery-dialog').close());
+  $('#lightbox-prev')?.addEventListener('click', () => movePhoto(-1));
+  $('#lightbox-next')?.addEventListener('click', () => movePhoto(1));
+  $('#gallery-dialog')?.addEventListener('keydown', event => {
     if (['ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); movePhoto(event.key === 'ArrowLeft' ? -1 : 1); }
   });
-  $('#gallery-dialog').addEventListener('close', () => lightboxTrigger?.focus({ preventScroll: true }));
-  $('#gallery-dialog').addEventListener('click', event => {
+  $('#gallery-dialog')?.addEventListener('close', () => lightboxTrigger?.focus({ preventScroll: true }));
+  $('#gallery-dialog')?.addEventListener('click', event => {
     const rect = $('#gallery-dialog').getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) $('#gallery-dialog').close();
   });
+  if (!$('#visit-form')) return;
   $('#visit-date').addEventListener('change', updateVisitTimes);
   $('#visit-date').addEventListener('focus', () => { $('#visit-date').min = salonDate(); });
   $('#visit-form').addEventListener('input', () => { $('#visit-summary').hidden = true; });
@@ -270,21 +232,13 @@ function setupInteractions() {
     const dateLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`));
     $('#visit-summary-text').textContent = `${service.name} · ${dateLabel} · ${formatTime(time)} Eastern Time. Please mention these preferences when you call. The salon will confirm the service, price, and available time.`;
     $('#visit-summary').hidden = false;
-    $('#visit-summary').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    $('#visit-summary').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
   });
-  const observer = new IntersectionObserver(entries => {
-    const entry = entries.filter(item => item.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-    if (!entry) return;
-    nav.querySelectorAll('a').forEach(link => {
-      const active = link.hash === `#${entry.target.id}`;
-      link.classList.toggle('active', active);
-      if (active) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
-    });
-  }, { rootMargin: '-15% 0px -65% 0px', threshold: 0 });
-  $$('main>section[id]').forEach(section => observer.observe(section));
 }
 
 async function init() {
+  if (redirectLegacyHome()) return;
+  initChrome();
   try {
     content = await loadPublishedContent();
     if (new URLSearchParams(location.search).get('preview') === 'draft') {
@@ -304,8 +258,8 @@ async function init() {
     console.error(error);
     $('#site-notice').textContent = 'The service menu and photo gallery could not be loaded. Please refresh, or call (717) 248-4131 for services and appointments.';
     $('#site-notice').hidden = false;
-    $('#visit-form').hidden = true;
-    $('#gallery-more').hidden = true;
+    if ($('#visit-form')) $('#visit-form').hidden = true;
+    if ($('#gallery-more')) $('#gallery-more').hidden = true;
   }
 }
 
