@@ -9,3 +9,6 @@
 @media(max-width:900px){.journal-content .blog-grid{grid-template-columns:1fr 1fr;gap:20px}.journal-article{width:calc(100% - 70px)}}
 @media(max-width:700px){.journal-content .blog-grid{grid-template-columns:1fr}.journal-article{width:calc(100% - 40px);margin:40px auto 60px}.journal-article>h1{font-size:43px;letter-spacing:-1.4px}.journal-article .article-cover{height:280px}.journal-article .article-deck{font-size:13px}.journal-article .article-body{width:100%;margin:30px 0}.journal-content .page-cta{padding:38px 25px}.journal-content .blog-card h2{font-size:30px}}
 @media(max-width:380px){.page-intro-copy h1{font-size:41px}.home-services-preview .service-card{grid-template-columns:38% 1fr}.home-services-preview .service-content{padding:20px 16px}.home-services-preview .service-content h3{font-size:24px}.home-services-preview .service-content>p{font-size:11px}.home-services-preview .service-photo{min-height:265px}.home-services-preview .service-read-more{font-size:9px}}
+
+/* Native photo expansion remains available before JavaScript loads. */
+.gallery-static-more{margin-top:31px}.gallery-static-more>summary{width:fit-content;margin:0 auto;padding:13px 24px;border:1px solid var(--wine);border-radius:3px;color:var(--wine);font-size:12px;cursor:pointer}.gallery-static-more>summary>span{margin-left:12px}.gallery-static-more[open]>.gallery-grid{margin-top:31px}
