@@ -4,6 +4,14 @@ export const GALLERY_CATEGORIES = { nails: 'Nail art', pedicure: 'Pedicures', sa
 export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export const SALON_TIMEZONE = 'America/New_York';
 
+export function directionsUrl(contact) {
+  return 'https://www.google.com/maps/dir/?' + new URLSearchParams({ api: '1', destination: fullAddress(contact) });
+}
+
+export function mapEmbedUrl(contact) {
+  return 'https://www.google.com/maps?' + new URLSearchParams({ q: fullAddress(contact), z: '16', hl: 'en', output: 'embed' });
+}
+
 const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const isText = (value, limit = 2000) => typeof value === 'string' && value.length <= limit;
 

@@ -31,6 +31,11 @@ class QuietHandler(http.server.SimpleHTTPRequestHandler):
         return super().translate_path(path)
 
 
+def block_external_map(context):
+    # Real map imagery is not replaced with a fixture or treated as verified here.
+    context.route(re.compile(r'^https://(?:www|maps)\.google\.com/maps(?:\?|$)'), lambda route: route.abort())
+
+
 class WebsiteTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -54,7 +59,7 @@ class WebsiteTests(unittest.TestCase):
         self.errors = []
         self.context = self.browser.new_context(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce', timezone_id='America/Los_Angeles')
         # Do not depend on the external map provider while testing local functionality.
-        self.context.route('https://maps.google.com/**', lambda route: route.abort())
+        block_external_map(self.context)
         self.context.on('page', lambda page: page.on('pageerror', lambda error: self.errors.append(str(error))))
         self.page = self.context.new_page()
 
@@ -114,7 +119,7 @@ class WebsiteTests(unittest.TestCase):
         expect(page.locator('.service-card, #service-grid, #gallery-grid')).to_have_count(0)
         expect(page.locator('#contact, #services, #specials, #gifts')).to_have_count(0)
         self.assertIn('A little polish.', page.locator('h1').inner_text())
-        self.assertIn('17044', page.locator('[data-full-address]').inner_text())
+        self.assertIn('17044', page.locator('.site-footer [data-full-address]').inner_text())
         expect(page.locator('.footer-contact [data-phone-link]')).to_have_attribute('href', 'tel:+17172484131')
         self.eager_images(page)
         page.screenshot(path=str(RESULTS / 'website-desktop.png'), full_page=True)
@@ -144,7 +149,7 @@ class WebsiteTests(unittest.TestCase):
             expect(page.locator('body')).to_have_attribute('data-page', key)
             expect(page.locator('#main-navigation a[aria-current="page"]')).to_have_attribute('href', re.compile(re.escape(file) + r'(?:\?.*)?$'))
             expect(page.locator('h1')).to_have_count(1)
-            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-gallery'])
+            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-directions'])
             titles.add(page.title())
             self.assertTrue(all(not href.startswith('#') for href in page.locator('#main-navigation a').evaluate_all('(nodes) => nodes.map(node => node.getAttribute("href"))')))
         self.assertEqual(len(titles), 7)
@@ -167,6 +172,7 @@ class WebsiteTests(unittest.TestCase):
 
     def test_main_page_navigation_works_without_javascript(self):
         context = self.browser.new_context(java_script_enabled=False, reduced_motion='reduce', viewport={'width': 1440, 'height': 1000})
+        block_external_map(context)
         try:
             page = context.new_page()
             page.goto(f'{self.url}/Creative-web-USA/index.html')
@@ -192,6 +198,7 @@ class WebsiteTests(unittest.TestCase):
 
     def test_published_menu_photos_and_offer_work_without_javascript(self):
         context = self.browser.new_context(java_script_enabled=False, reduced_motion='reduce', viewport={'width': 1440, 'height': 1000})
+        block_external_map(context)
         try:
             page = context.new_page()
             response = page.goto(f'{self.url}/Creative-web-USA/services.html?v=old&preview=draft')
@@ -348,20 +355,22 @@ class WebsiteTests(unittest.TestCase):
         frame = page.locator('[data-map-embed]')
         expect(frame).to_have_count(1)
         source = urlsplit(frame.get_attribute('src'))
-        self.assertEqual(source.hostname, 'maps.google.com')
+        self.assertEqual(source.hostname, 'www.google.com')
+        self.assertEqual(source.path, '/maps')
+        expect(frame).to_have_attribute('loading', 'eager')
         query = parse_qs(source.query)
         address = '8 W. Water St., Lewistown, PA 17044'
         self.assertEqual(query['q'], [address])
         self.assertEqual(query['output'], ['embed'])
         self.assertEqual(query['z'], ['16'])
         overlay = page.locator('.salon-map-overlay')
-        self.assertEqual(parse_qs(urlsplit(overlay.get_attribute('href')).query)['query'], [address])
+        self.assertEqual(parse_qs(urlsplit(overlay.get_attribute('href')).query)['destination'], [address])
         # Stub only the external destination to verify the click opens the correct URL.
-        self.context.route('https://www.google.com/maps/search/**', lambda route: route.fulfill(status=200, content_type='text/html', body='<title>Directions destination</title>'))
+        self.context.route('https://www.google.com/maps/dir/**', lambda route: route.fulfill(status=200, content_type='text/html', body='<title>Directions destination</title>'))
         with page.expect_popup() as popup:
             overlay.click()
         popup.value.wait_for_load_state()
-        self.assertEqual(parse_qs(urlsplit(popup.value.url).query)['query'], [address])
+        self.assertEqual(parse_qs(urlsplit(popup.value.url).query)['destination'], [address])
         popup.value.close()
         for width in [1440, 768, 390, 320]:
             page.set_viewport_size({'width': width, 'height': 844})
@@ -384,7 +393,36 @@ class WebsiteTests(unittest.TestCase):
         expect(preview.locator('.quick-contact-phone')).to_have_attribute('href', 'tel:+17175550123')
         expect(preview.locator('.quick-contact-facebook')).to_have_attribute('href', 'https://www.facebook.com/TestSalonPage')
         self.assertEqual(parse_qs(urlsplit(preview.locator('[data-map-embed]').get_attribute('src')).query)['q'], ['10 W. Water St., Lewistown, PA 17044'])
-        self.assertEqual(parse_qs(urlsplit(preview.locator('.salon-map-overlay').get_attribute('href')).query)['query'], ['10 W. Water St., Lewistown, PA 17044'])
+        self.assertEqual(parse_qs(urlsplit(preview.locator('.salon-map-overlay').get_attribute('href')).query)['destination'], ['10 W. Water St., Lewistown, PA 17044'])
+
+    def test_maps_are_discoverable_on_home_and_before_the_contact_planner_even_without_json(self):
+        page = self.page
+        page.route('**/content.json', lambda route: route.abort())
+        for file in ['index.html', 'booking.html']:
+            response = page.goto(f'{self.url}/Creative-web-USA/{file}')
+            expect(page.locator('#site-notice')).to_be_visible()
+            frame = page.locator('#salon-location [data-map-embed]')
+            expect(frame).to_have_count(1)
+            expect(frame).to_have_attribute('loading', 'eager')
+            self.assertIn('Street map of the neighborhood', response.text())
+            self.assertEqual(parse_qs(urlsplit(frame.get_attribute('src')).query)['q'], ['8 W. Water St., Lewistown, PA 17044'])
+            if file == 'index.html':
+                page.locator('.hero-map-link').click()
+                self.assertEqual(urlsplit(page.url).fragment, 'salon-location')
+            else:
+                self.assertEqual(page.locator('#salon-location').evaluate('(node) => node.nextElementSibling.id'), 'contact')
+            frame.scroll_into_view_if_needed()
+            expect(frame).to_be_in_viewport()
+            self.assertGreaterEqual(frame.bounding_box()['height'], 340)
+            button = page.locator('.salon-map-heading a')
+            expect(button).to_have_text(re.compile('Get directions'))
+            self.assertEqual(urlsplit(button.get_attribute('href')).path, '/maps/dir/')
+            self.assertEqual(parse_qs(urlsplit(button.get_attribute('href')).query)['destination'], ['8 W. Water St., Lewistown, PA 17044'])
+            page.set_viewport_size({'width': 390, 'height': 844})
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), 390)
+            self.assertEqual(page.locator('.salon-map-preview').bounding_box()['height'], 340)
+            self.assertGreaterEqual(frame.bounding_box()['height'], 330)
+            page.set_viewport_size({'width': 1440, 'height': 1000})
 
     def test_service_detail_mobile_and_missing_service(self):
         page = self.open_public(suffix='service.html?service=nail-art')
@@ -454,6 +492,7 @@ class WebsiteTests(unittest.TestCase):
 
     def test_effects_scroll_progress_and_reduced_motion(self):
         context = self.browser.new_context(viewport={'width': 1366, 'height': 700}, reduced_motion='no-preference')
+        block_external_map(context)
         try:
             page = context.new_page()
             page.on('pageerror', lambda error: self.errors.append(str(error)))

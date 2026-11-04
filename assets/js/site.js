@@ -1,7 +1,7 @@
-import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js?v=20261104-gallery';
-import { observeEffects } from './effects.js?v=20261104-gallery';
-import { PAGE_LABELS, SITE_URL, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-gallery';
-import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js?v=20261104-gallery';
+import { applyBusinessContent, initChrome, redirectLegacyHome } from './chrome.js?v=20261104-directions';
+import { observeEffects } from './effects.js?v=20261104-directions';
+import { PAGE_LABELS, SITE_URL, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-directions';
+import { CATEGORIES, DAYS, activePromotions, appointmentSlots, createElement as el, formatPrice, formatTime, loadDraft, loadPublishedContent, salonDate } from './core.js?v=20261104-directions';
 
 let content;
 let serviceFilter = 'all';

@@ -1,7 +1,7 @@
-import { applyBusinessContent, initChrome } from './chrome.js?v=20261104-gallery';
-import { observeEffects } from './effects.js?v=20261104-gallery';
-import { canonicalHref, pageHref, previewParameters } from './routes.js?v=20261104-gallery';
-import { CATEGORIES, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js?v=20261104-gallery';
+import { applyBusinessContent, initChrome } from './chrome.js?v=20261104-directions';
+import { observeEffects } from './effects.js?v=20261104-directions';
+import { canonicalHref, pageHref, previewParameters } from './routes.js?v=20261104-directions';
+import { CATEGORIES, createElement as el, directionsUrl, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js?v=20261104-directions';
 
 const $ = selector => document.querySelector(selector);
 const params = new URLSearchParams(location.search);
@@ -43,7 +43,7 @@ function renderService(service, content) {
   $('#good-to-know-section').hidden = !service.goodToKnow;
   $('#service-good-to-know').textContent = service.goodToKnow || '';
   $('#service-address').textContent = fullAddress(contact);
-  $('#service-directions').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress(contact))}`;
+  $('#service-directions').href = directionsUrl(contact);
   renderPhotos(service, content);
   renderRelated(service, content);
   observeEffects();

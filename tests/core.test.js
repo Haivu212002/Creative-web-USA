@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { LEGACY_HASH_ROUTES, NAV_PAGES, PAGE_ROUTES, SITE_RELEASE, SITE_URL, canonicalHref, legacyServiceId, pageHref, previewParameters } from '../assets/js/routes.js';
 import { renderGallery, renderPromotions, renderServices } from '../scripts/static-content.mjs';
-import { activePromotions, appointmentSlots, DRAFT_KEY, formatPrice, formatTime, isDate, loadDraft, safeFacebook, safeImage, salonDate, saveDraft, validateContent } from '../assets/js/core.js';
+import { activePromotions, appointmentSlots, DRAFT_KEY, directionsUrl, fullAddress, mapEmbedUrl, formatPrice, formatTime, isDate, loadDraft, safeFacebook, safeImage, salonDate, saveDraft, validateContent } from '../assets/js/core.js';
 
 const published = JSON.parse(readFileSync(new URL('../content.json', import.meta.url), 'utf8'));
 const clone = () => structuredClone(published);
@@ -166,6 +166,23 @@ test('canonical URLs use the live Pages address and only preserve parameters tha
   assert.equal(canonicalHref('contact', { service: 'manicure' }), `${SITE_URL}booking.html`);
   assert.equal(canonicalHref('service', { service: 'nail-art', v: 'old', preview: 'draft' }), `${SITE_URL}service.html?service=nail-art`);
   assert.throws(() => canonicalHref('unknown'));
+});
+
+test('maps show the salon neighborhood while direction links open a route to the same address', () => {
+  const route = new URL(directionsUrl(published.contact));
+  assert.equal(route.origin, 'https://www.google.com');
+  assert.equal(route.pathname, '/maps/dir/');
+  assert.equal(route.searchParams.get('api'), '1');
+  assert.equal(route.searchParams.get('destination'), fullAddress(published.contact));
+  assert.equal(route.searchParams.has('origin'), false);
+  const embed = new URL(mapEmbedUrl(published.contact));
+  assert.equal(embed.searchParams.get('q'), route.searchParams.get('destination'));
+  assert.equal(embed.searchParams.get('z'), '16');
+  assert.equal(embed.searchParams.get('output'), 'embed');
+  const changed = { ...published.contact, address: '10 W. Water St. & destination=Another place' };
+  const encoded = new URL(directionsUrl(changed));
+  assert.deepEqual([...encoded.searchParams.keys()], ['api', 'destination']);
+  assert.equal(encoded.searchParams.get('destination'), fullAddress(changed));
 });
 
 test('static content treats salon text as text and shows dated offers without relying on the build date', () => {
