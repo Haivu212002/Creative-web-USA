@@ -1,0 +1,9 @@
+{
+  "home": "index.html",
+  "services": "services.html",
+  "gallery": "gallery.html",
+  "specials": "offers.html",
+  "about": "about.html",
+  "gifts": "gift-certificates.html",
+  "contact": "booking.html"
+}

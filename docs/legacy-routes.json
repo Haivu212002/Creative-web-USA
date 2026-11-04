@@ -1,10 +1,6 @@
 {
-  "services.html": "services",
-  "pricing.html": "services",
-  "gallery.html": "gallery",
-  "transformations.html": "gallery",
-  "reviews.html": "about",
-  "offers.html": "specials",
-  "visit.html": "contact",
-  "booking.html": "contact"
+  "pricing.html": "services.html",
+  "transformations.html": "gallery.html",
+  "reviews.html": "about.html",
+  "visit.html": "booking.html"
 }

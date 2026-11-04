@@ -1,24 +1,14 @@
+import { applyBusinessContent, initChrome } from './chrome.js';
+import { observeEffects } from './effects.js';
+import { pageHref, previewParameters } from './routes.js';
 import { CATEGORIES, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js';
 
 const $ = selector => document.querySelector(selector);
-const $$ = selector => document.querySelectorAll(selector);
 const params = new URLSearchParams(location.search);
 const preview = params.get('preview') === 'draft';
 
-function homeUrl(hash = '', serviceId = '') {
-  const url = new URL('./', location.href);
-  if (preview) url.searchParams.set('preview', 'draft');
-  if (serviceId) url.searchParams.set('service', serviceId);
-  url.hash = hash;
-  return url.href;
-}
-
 function serviceUrl(id) {
-  const url = new URL('service.html', location.href);
-  url.search = ''; url.hash = '';
-  url.searchParams.set('service', id);
-  if (preview) url.searchParams.set('preview', 'draft');
-  return url.href;
+  return pageHref('service', { service: id, ...previewParameters(location.search) });
 }
 
 function arrow() {
@@ -47,7 +37,7 @@ function renderService(service, content) {
   $('#service-image').src = service.image;
   $('#service-image').alt = service.category === 'spa' ? 'The welcoming interior of Fashion Nails & Spa' : `${service.name} inspiration from our salon photo collection`;
   $('#service-image-note').textContent = service.category === 'spa' ? 'A look inside our salon. Call to ask about current treatments.' : 'From our salon photo collection. Bring your own inspiration, too.';
-  for (const id of ['#service-plan', '#mobile-service-plan']) $(id).href = homeUrl('contact', service.id);
+  for (const id of ['#service-plan', '#mobile-service-plan']) $(id).href = pageHref('contact', { service: service.id, ...previewParameters(location.search) });
   populateList('#service-highlights', '#highlights-section', service.highlights);
   populateList('#service-preparation', '#preparation-section', service.preparation);
   $('#good-to-know-section').hidden = !service.goodToKnow;
@@ -56,6 +46,7 @@ function renderService(service, content) {
   $('#service-directions').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress(contact))}`;
   renderPhotos(service, content);
   renderRelated(service, content);
+  observeEffects();
   document.title = `${service.name} | ${content.brand.name} · ${contact.city}, ${contact.state}`;
   $('meta[name="description"]').content = `${service.name} at ${content.brand.name} in ${contact.city}, ${contact.state}. ${service.description} Call ${contact.phoneDisplay} for pricing and appointments.`;
   const schema = { '@context': 'https://schema.org', '@type': 'Service', name: service.name, description: service.details || service.description, serviceType: CATEGORIES[service.category], provider: { '@type': 'NailSalon', name: content.brand.name, telephone: contact.phone, address: { '@type': 'PostalAddress', streetAddress: contact.address, addressLocality: contact.city, addressRegion: contact.state, postalCode: contact.zip, addressCountry: 'US' } } };
@@ -92,22 +83,8 @@ function renderRelated(service, content) {
   }
 }
 
-function setupMenu() {
-  const toggle = $('.menu-toggle');
-  const nav = $('#main-navigation');
-  const close = () => { nav.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-label', 'Open menu'); };
-  toggle.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') !== 'true';
-    nav.classList.toggle('is-open', open); toggle.setAttribute('aria-expanded', String(open)); toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-  });
-  document.addEventListener('keydown', event => { if (event.key === 'Escape' && nav.classList.contains('is-open')) { close(); toggle.focus(); } });
-  document.addEventListener('click', event => { if (!event.target.closest('.site-header')) close(); });
-  nav.querySelectorAll('a').forEach(link => link.addEventListener('click', close));
-}
-
 async function init() {
-  setupMenu();
-  $$('[data-home-link]').forEach(link => { link.href = homeUrl(new URL(link.href).hash); });
+  initChrome();
   try {
     let content = await loadPublishedContent();
     let notice = '';
@@ -116,9 +93,7 @@ async function init() {
       try { const draft = loadDraft(); if (draft) content = draft.content; else notice = 'No local draft found. Showing the published service details.'; }
       catch { notice = 'The local draft could not be loaded. Showing the published service details.'; }
     }
-    $$('[data-phone-link]').forEach(link => { link.href = `tel:${content.contact.phone}`; });
-    $$('[data-phone-display]').forEach(node => { node.textContent = content.contact.phoneDisplay; });
-    $('#footer-address').textContent = fullAddress(content.contact);
+    applyBusinessContent(content);
     const service = content.services.find(item => item.id === params.get('service'));
     $('#service-status').textContent = notice;
     $('#service-status').hidden = !notice;

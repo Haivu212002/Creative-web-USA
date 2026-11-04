@@ -1,6 +1,6 @@
 # Fashion Nails & Spa
 
-Website tiếng Anh dành cho khách tại Lewistown; Content Studio tiếng Việt dành cho người chỉnh nội dung. Website tĩnh, không cần build, không có package phụ thuộc và không gửi dữ liệu khách hàng đến máy chủ.
+Website đa trang tiếng Anh dành cho khách tại Lewistown; Content Studio tiếng Việt dành cho người chỉnh nội dung. Các file HTML hoàn chỉnh đã được tạo và commit để GitHub Pages phục vụ trực tiếp. Không có package runtime phụ thuộc và không gửi dữ liệu khách hàng đến máy chủ.
 
 ## Chạy và kiểm tra
 
@@ -12,7 +12,7 @@ Từ `/workspace/Creative-web-USA`:
 npm start
 ```
 
-Lệnh này dùng Python 3 để phục vụ file qua HTTP, cổng 4173. Có thể chạy trực tiếp `python3 -m http.server 4173 --bind 0.0.0.0`. Không cần `npm install`. Mở trang gốc cho website và đường dẫn `admin/` cho Content Studio. Các module JavaScript cần HTTP; không mở bằng `file://`.
+Lệnh này dùng Python 3 để phục vụ file qua HTTP, cổng 4173. Có thể chạy trực tiếp `python3 -m http.server 4173 --bind 0.0.0.0`. Không cần `npm install`. Khi chỉnh template trong `templates/`, chạy `npm run build` để tạo lại các file HTML; `npm run check` kiểm tra các file đã đồng bộ với template. Mở trang gốc cho website và đường dẫn `admin/` cho Content Studio. Các module JavaScript cần HTTP; không mở bằng `file://`.
 
 ```sh
 npm run check
@@ -24,7 +24,17 @@ Kiểm tra logic dùng Node.js >=20. Kiểm tra trình duyệt dùng Python, th�
 
 ## Cấu trúc
 
-- `index.html`: website 7 mục menu.
+- `index.html`: Home, chỉ giới thiệu và xem nhanh dịch vụ/ảnh.
+- `services.html`: Services & Prices, đầy đủ menu dịch vụ và bộ lọc.
+- `gallery.html`: Gallery, bộ lọc, xem thêm và lightbox.
+- `offers.html`: Specials & Rewards.
+- `about.html`: About Us, không gian salon, ảnh cộng đồng và liên kết Journal.
+- `gift-certificates.html`: Gift Certificates.
+- `booking.html`: Contact & Book, địa chỉ, giờ mở cửa và planner gọi xác nhận.
+- `templates/layout.html`, `templates/partials/`, `templates/pages/`: nguồn HTML dùng chung; `scripts/build-pages.mjs` tạo 13 file HTML độc lập (7 menu chính, trang chi tiết, Journal/bài viết và privacy).
+- `assets/js/routes.js`: ánh xạ trang chính và các liên kết giữ dịch vụ/bản nháp; `assets/js/chrome.js` quản lý menu chung.
+- `assets/js/effects.js`, `assets/css/effects.css`: hiệu ứng xuất hiện khi cuộn, hover, menu, dialog, thanh tiến độ và nút về đầu trang; hỗ trợ giảm chuyển động.
+- `assets/css/multipage.css`: bố cục banner và nội dung riêng cho từng trang.
 - `assets/css/site.css`: giao diện desktop/mobile, các thành phần dùng chung.
 - `assets/js/site.js`: lọc dịch vụ, gallery/lightbox, planner gọi xác nhận lịch.
 - `service.html?service=<id>`, `assets/js/service.js`, `assets/css/service.css`: trang thông tin riêng của từng dịch vụ; ảnh, tiêu đề và liên kết trong card đều mở đúng dịch vụ.
@@ -53,7 +63,7 @@ Studio là công cụ chỉnh **bản nháp cục bộ**, không phải backend 
 
 1. Vào `admin/`, sửa dịch vụ/giá, ảnh, ưu đãi, nội dung hoặc giờ mở cửa. Lưu từng mục.
 2. Bản nháp nằm trong `localStorage`, khóa `fashion-nails.content-draft.v1`. Chỉ tồn tại trên cùng trình duyệt và origin; có thể mất khi xóa dữ liệu trình duyệt.
-3. “Xem trước” mở `?preview=draft` và có banner nhận diện. Khách truy cập bình thường vẫn đọc file công khai; bản nháp không tự trở thành nội dung công khai.
+3. “Xem trước” mở trang phù hợp với mục đang chỉnh (ví dụ `services.html?preview=draft` hoặc `gallery.html?preview=draft`) và có banner nhận diện. Tham số bản nháp được giữ khi đi qua menu và trang chi tiết. Khách truy cập bình thường vẫn đọc file công khai; bản nháp không tự trở thành nội dung công khai.
 4. “Xuất content.json” tải một bản sao. “Nhập JSON” kiểm tra schema và yêu cầu xác nhận trước khi thay bản nháp. Hai tab cùng sửa sẽ được cảnh báo và chặn ghi đè từ tab cũ.
 5. Để đưa nội dung lên website, sao lưu file cũ, kiểm tra diff, thay `content.json` bằng file đã xuất rồi triển khai repository. Studio không có token GitHub và không tự push.
 
@@ -73,12 +83,20 @@ Gift certificates hiện hướng khách gọi hoặc ghé salon để mua; khô
 
 ## GitHub Pages và bảo toàn code
 
-Tất cả URL nội bộ dùng đường dẫn tương đối để chạy được ở cả `/` và `/Creative-web-USA/`. File `.nojekyll` cho phép phục vụ trực tiếp file tĩnh. Không có bước build hoặc workflow triển khai tự động.
+Tất cả URL nội bộ dùng đường dẫn tương đối để chạy được ở cả `/` và `/Creative-web-USA/`. File `.nojekyll` cho phép phục vụ trực tiếp file tĩnh. Chạy `npm run build` khi sửa các template, rồi commit cả nguồn và HTML được tạo. Không cần build trên máy chủ: GitHub Pages dùng các file HTML đã commit; tác vụ Pages tự chạy khi cập nhật `gh-pages`.
 
 Checkout ban đầu chỉ có README tại `f7db62f`, nhánh `work`. Khi chuẩn bị xuất bản ngày 03/11/2026, GitHub đã được đọc thành công bằng lệnh có quyền truy cập mạng qua proxy. Đã xác minh `main` còn ở `f7db62f`, còn `gh-pages` ở `1d6f42cf1dc1ff5dbb76fecf61e39c7391cb6d07`, chứa 21 file của demo cũ. GitHub Actions hiển thị Pages build/deployment thành công cho nhánh `gh-pages` từ bản demo trước.
 
-Trước khi tích hợp, toàn bộ 21 file cũ được lưu và đối chiếu byte trong `/workspace/artifacts/fashion-nails-before-refresh-gh-pages-1d6f42c.zip`. Lịch sử `gh-pages` được giữ làm cha của commit cập nhật. Không dùng force-push hoặc reset remote. Các bài Journal, stylesheet/script và bốn ảnh cũ vẫn được giữ lại. Các URL demo cũ được chuyển sang mục tương ứng trong website mới theo `docs/legacy-routes.json`; `booking.html?service=design` chuyển và chọn Nail Art trong planner. Privacy notice được sửa để phản ánh đúng việc không gửi booking hoặc thu thông tin khách hàng.
+Trước khi tích hợp, toàn bộ 21 file cũ được lưu và đối chiếu byte trong `/workspace/artifacts/fashion-nails-before-refresh-gh-pages-1d6f42c.zip`. Lịch sử `gh-pages` được giữ làm cha của commit cập nhật. Không dùng force-push hoặc reset remote. Nội dung các bài Journal và bốn ảnh cũ vẫn được giữ lại; Journal dùng header/footer và CSS chung của bản đa trang. Stylesheet/script cũ vẫn có trong lịch sử và checkout để đối chiếu. Các URL phụ cũ (`pricing.html`, `transformations.html`, `reviews.html`, `visit.html`) được chuyển đến file trang mới theo `docs/legacy-routes.json`. Các bookmark cũ như `/#services` hoặc `/#contact` chuyển đến file riêng tương ứng, không phục dựng trang đơn. `booking.html?service=design` vẫn chọn Nail Art trong planner. Privacy notice được sửa để phản ánh đúng việc không gửi booking hoặc thu thông tin khách hàng.
 
 Bản tích hợp cuối cùng được dùng cho cả source `main` và nhánh xuất bản `gh-pages`, qua cập nhật fast-forward. Không thêm `CNAME`, không đổi DNS hoặc thiết lập thanh toán/booking backend. Xem lịch sử Git và GitHub Actions để kiểm tra commit và kết quả triển khai thực tế.
 
 Trong môi trường cloud, lệnh mạng có thể cần quyền phù hợp dù proxy đã được cấu hình. Giữ proxy và TLS verification; không bỏ proxy để vượt chính sách. Nếu API GitHub hoặc địa chỉ Pages bị HTTP 403 vì chính sách mạng, cần cho phép `api.github.com` và `haivu212002.github.io` trong cài đặt môi trường. Lưu bản nháp mạng không tự áp dụng hoặc xuất bản. Có thể theo dõi kết quả Pages trên trang GitHub Actions công khai qua `github.com` khi host đó được phép.
+
+## Điều hướng đa trang và chuyển động
+
+Bảy menu chính trỏ đến bảy file HTML thật, không cuộn giữa các phần của một trang và không dùng router SPA. Nút Back/Forward dùng lịch sử tài liệu của trình duyệt; các liên kết menu hoạt động ngay cả khi tắt JavaScript. Trang chủ chỉ có giới thiệu, ba dịch vụ xem nhanh, bốn ảnh xem nhanh và lời mời ghé salon.
+
+Hiệu ứng dùng CSS và IntersectionObserver: banner xuất hiện nhẹ, ảnh phóng khi hover, thẻ nổi, phần nội dung xuất hiện khi cuộn, menu điện thoại chuyển động, lightbox mở nhẹ, thanh tiến độ đọc và nút về đầu trang. Trình duyệt hỗ trợ có chuyển cảnh tài liệu bằng View Transitions; trình duyệt khác điều hướng bình thường. Không chặn liên kết để giả lập đổi trang. Hiệu ứng tôn trọng `prefers-reduced-motion`, và nội dung vẫn hiện khi không có JavaScript hoặc IntersectionObserver.
+
+Bộ kiểm tra trình duyệt xác minh riêng các điều hướng có HTTP document response, lịch sử Back/Forward, toàn bộ trang chính trên desktop/mobile, menu khi tắt JavaScript, ảnh/dịch vụ, booking, dữ liệu bản nháp và chuyển động thường/giảm chuyển động.

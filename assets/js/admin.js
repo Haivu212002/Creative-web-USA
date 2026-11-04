@@ -1,3 +1,4 @@
+import { pageHref } from './routes.js';
 import { CATEGORIES, DAYS, DRAFT_KEY, GALLERY_CATEGORIES, activePromotions, createElement as el, formatPrice, fullAddress, loadDraft, loadPublishedContent, safeImage, saveDraft, uniqueId, validateContent } from './core.js';
 
 const $ = selector => document.querySelector(selector);
@@ -314,6 +315,8 @@ async function closeEditor() {
 function setPanel(panel) {
   if (!$('#panel-' + panel)) panel = 'overview';
   currentPanel = panel;
+  const previewPage = { services: 'services', gallery: 'gallery', promotions: 'specials', booking: 'contact' }[panel] || 'home';
+  $('#preview-link').href = '../' + pageHref(previewPage, { preview: 'draft' });
   $$('.studio-panel').forEach(section => { section.hidden = section.id !== `panel-${panel}`; });
   $$('[data-panel]').forEach(link => {
     const active = link.dataset.panel === panel;
