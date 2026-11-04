@@ -149,7 +149,7 @@ class WebsiteTests(unittest.TestCase):
             expect(page.locator('body')).to_have_attribute('data-page', key)
             expect(page.locator('#main-navigation a[aria-current="page"]')).to_have_attribute('href', re.compile(re.escape(file) + r'(?:\?.*)?$'))
             expect(page.locator('h1')).to_have_count(1)
-            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-directions'])
+            self.assertEqual(parse_qs(urlsplit(page.url).query).get('v'), ['20261104-type'])
             titles.add(page.title())
             self.assertTrue(all(not href.startswith('#') for href in page.locator('#main-navigation a').evaluate_all('(nodes) => nodes.map(node => node.getAttribute("href"))')))
         self.assertEqual(len(titles), 7)
