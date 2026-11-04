@@ -1,4 +1,4 @@
-import { PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-gallery';
+import { PAGE_ROUTES, legacyServiceId, pageHref, previewParameters } from './routes.js?v=20261104-directions';
 
 // Older secondary URLs keep working while each main menu now has its own file.
 const target = document.documentElement.dataset.legacyTarget;

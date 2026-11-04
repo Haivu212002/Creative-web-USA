@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { NAV_PAGES, PAGE_LABELS, PAGE_ROUTES, SITE_RELEASE, canonicalHref, pageHref } from '../assets/js/routes.js';
-import { validateContent } from '../assets/js/core.js';
+import { directionsUrl, fullAddress, mapEmbedUrl, validateContent } from '../assets/js/core.js';
 import { escapeHtml as escape, renderGallery, renderGalleryMore, renderPromotions, renderServices } from './static-content.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -15,6 +15,11 @@ const lightbox = await read('templates/partials/lightbox.html');
 const published = JSON.parse(await read('content.json'));
 const errors = validateContent(published);
 if (errors.length) throw new Error(`Invalid content.json:\n${errors.join('\n')}`);
+const mapTokens = { MAP_ADDRESS: fullAddress(published.contact), MAP_DIRECTIONS: directionsUrl(published.contact), MAP_EMBED: mapEmbedUrl(published.contact) };
+const map = (await read('templates/partials/salon-map.html')).replace(/\{\{([A-Z_]+)\}\}/g, (_, key) => {
+  if (!Object.hasOwn(mapTokens, key)) throw new Error(`Unknown map token: ${key}`);
+  return escape(mapTokens[key]);
+});
 const offerNames = published.promotions.filter(offer => offer.enabled).map(offer => [offer.title, offer.highlight].filter(Boolean).join(' '));
 const descriptions = {
   home: 'Your little beauty escape in Lewistown. Nails, pedicures, waxing and facial care at 8 W. Water St. Call (717) 248-4131.',
@@ -40,6 +45,8 @@ for (const [page, file] of Object.entries(PAGE_ROUTES)) {
   const fragment = await read(`templates/pages/${page}.html`);
   const photos = page === 'about' ? published.gallery.filter(photo => photo.category === 'community').slice(0, 2) : published.gallery.filter(photo => photo.category !== 'inspiration');
   const contentTokens = {
+    MAP_CONTENT: () => map,
+    DIRECTIONS_URL: () => escape(directionsUrl(published.contact)),
     SERVICES_CONTENT: () => renderServices(published.services),
     GALLERY_CONTENT: () => renderGallery(photos.slice(0, 8)),
     GALLERY_MORE: () => renderGalleryMore(photos.slice(8)),
