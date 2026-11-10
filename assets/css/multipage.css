@@ -34,3 +34,9 @@
 @media(min-width:1001px){.split-heading>p{max-width:38ch;flex-shrink:0}}
 @media(min-width:901px){.page-intro-grid:not(.has-photo) .page-intro-copy h1{max-width:none}.page-intro{padding-top:54px;padding-bottom:56px}}
 @media(max-width:700px){.page-intro-copy h1,.journal-content .page-intro h1{font-size:clamp(36px,5.5vw,38px);letter-spacing:-1px;line-height:1.16}.page-intro-copy>p:not(.eyebrow):not(.inspiration-disclosure){font-size:13px}.split-heading>p{max-width:none;flex-shrink:1}}
+
+/* Floating contact buttons never sit on top of links: they step aside for the footer (which repeats them) and key links move out of their column. */
+.quick-contact{transition:opacity .2s,translate .2s,visibility .2s}.quick-contact.is-tucked{opacity:0;visibility:hidden;translate:0 8px;pointer-events:none}.footer-bottom{padding-right:64px}
+@media(max-width:1200px){.salon-map-overlay{justify-content:flex-start}}
+@media(max-width:1000px){.salon-map-heading{display:block}.salon-map-heading>.button{margin-top:20px}}
+@media(max-width:700px){.hero-copy .button-row{flex-direction:column}.footer-bottom{padding-right:46px}}

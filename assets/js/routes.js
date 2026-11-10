@@ -1,4 +1,4 @@
-export const SITE_RELEASE = '20261104-type';
+export const SITE_RELEASE = '20261110-floating';
 export const SITE_URL = 'https://haivu212002.github.io/Creative-web-USA/';
 
 export const PAGE_ROUTES = Object.freeze({

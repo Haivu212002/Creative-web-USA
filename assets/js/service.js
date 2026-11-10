@@ -1,7 +1,7 @@
-import { applyBusinessContent, initChrome } from './chrome.js?v=20261104-type';
-import { observeEffects } from './effects.js?v=20261104-type';
-import { canonicalHref, pageHref, previewParameters } from './routes.js?v=20261104-type';
-import { CATEGORIES, createElement as el, directionsUrl, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js?v=20261104-type';
+import { applyBusinessContent, initChrome } from './chrome.js?v=20261110-floating';
+import { observeEffects } from './effects.js?v=20261110-floating';
+import { canonicalHref, pageHref, previewParameters } from './routes.js?v=20261110-floating';
+import { CATEGORIES, createElement as el, directionsUrl, formatPrice, fullAddress, loadDraft, loadPublishedContent } from './core.js?v=20261110-floating';
 
 const $ = selector => document.querySelector(selector);
 const params = new URLSearchParams(location.search);

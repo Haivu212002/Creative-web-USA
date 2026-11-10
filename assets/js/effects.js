@@ -34,6 +34,8 @@ export function initEffects() {
   updateMotion();
   const top = document.querySelector('.back-to-top');
   const header = document.querySelector('.site-header');
+  const quickContact = document.querySelector('.quick-contact');
+  const footer = document.querySelector('.site-footer');
   let scheduled = false;
   const updateScroll = () => {
     const maximum = document.documentElement.scrollHeight - innerHeight;
@@ -41,6 +43,8 @@ export function initEffects() {
     document.documentElement.style.setProperty('--reading-progress', String(progress));
     header?.classList.toggle('is-scrolled', scrollY > 16);
     if (top) { top.classList.toggle('is-visible', scrollY > 500); top.tabIndex = scrollY > 500 ? 0 : -1; }
+    // The footer repeats the phone and Facebook links, so the floating copies step aside instead of covering them.
+    if (quickContact && footer) quickContact.classList.toggle('is-tucked', footer.getBoundingClientRect().top < quickContact.getBoundingClientRect().bottom);
     scheduled = false;
   };
   const schedule = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(updateScroll); } };
